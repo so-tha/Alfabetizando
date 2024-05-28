@@ -1,4 +1,4 @@
-# Aplicativo de Acessibilidade para Crianças Autistas
+# Aplicativo para auxiliar na alfabetização de Crianças Autistas não verbais
 
 ## Índice
 1. [Introdução](#introdução)
