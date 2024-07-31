@@ -8,9 +8,9 @@ class RegisterUser extends StatefulWidget {
 }
 
 class _RegisterUserState extends State<RegisterUser> {
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController(); // Pre-fill email (optional)
+  final _emailController = TextEditingController(); 
   final _passwordController = TextEditingController();
 
   @override
@@ -24,7 +24,7 @@ class _RegisterUserState extends State<RegisterUser> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey, // Assign form key
+      key: _formKey, 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -37,7 +37,7 @@ class _RegisterUserState extends State<RegisterUser> {
               if (value == null || value.isEmpty) {
                 return 'Por favor, insira seu nome.';
               }
-              return null; // No validation error
+              return null; 
             },
           ),
           const SizedBox(height: 16.0),
@@ -53,13 +53,13 @@ class _RegisterUserState extends State<RegisterUser> {
               } else if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+").hasMatch(value)) {
                 return 'Por favor, insira um email válido.';
               }
-              return null; // No validation error
+              return null;
             },
           ),
           const SizedBox(height: 16.0),
           TextFormField(
             controller: _passwordController,
-            obscureText: true, // Hide password characters
+            obscureText: true, 
             decoration: const InputDecoration(
               labelText: 'Senha',
             ),
@@ -67,7 +67,7 @@ class _RegisterUserState extends State<RegisterUser> {
               if (value == null || value.isEmpty) {
                 return 'Por favor, insira sua senha.';
               }
-              return null; // No validation error
+              return null; 
             },
           ),
           const SizedBox(height: 24.0),
@@ -80,12 +80,9 @@ class _RegisterUserState extends State<RegisterUser> {
                 String email = _emailController.text;
                 String password = _passwordController.text;
 
-                // Example: Show a snackbar to indicate submission
+              
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text('Registrando...')));
-
-                // Replace with your actual registration logic
-                // (e.g., call an API, store data, etc.)
               }
             },
             child: const Text('Registra-se'),
