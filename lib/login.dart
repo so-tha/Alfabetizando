@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:alfabetizando_tcc/registrar.dart';
 
-class RegisterUser extends StatefulWidget {
-  const RegisterUser({super.key});
+class loginUser extends StatefulWidget {
+  const loginUser({super.key});
 
   @override
-  State<RegisterUser> createState() => _RegisterUserState();
+  State<loginUser> createState() => _loginUserState();
 }
 
-class _RegisterUserState extends State<RegisterUser> {
+class _loginUserState extends State<loginUser> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController(); 
   final _passwordController = TextEditingController();
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +22,6 @@ class _RegisterUserState extends State<RegisterUser> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Nome',
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor, insira seu nome.';
-              }
-              return null; 
-            },
-          ),
           const SizedBox(height: 16.0),
           TextFormField(
             controller: _emailController,
@@ -83,7 +65,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     .showSnackBar(SnackBar(content: Text('Registrando...')));
               }
             },
-            child: const Text('Registra-se'),
+            child: const Text('Login'),
           ),
         ],
       ),
