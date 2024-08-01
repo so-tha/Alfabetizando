@@ -10,7 +10,6 @@ class loginUser extends StatefulWidget {
 
 class _loginUserState extends State<loginUser> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController(); 
   final _passwordController = TextEditingController();
 
@@ -58,11 +57,10 @@ class _loginUserState extends State<loginUser> {
               if (_formKey.currentState!.validate()) {
                 // Handle form submission logic here
                 // Access form data using controllers
-                String name = _nameController.text;
                 String email = _emailController.text;
                 String password = _passwordController.text;
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text('Registrando...')));
+                    .showSnackBar(SnackBar(content: Text('Efetuando Login...')));
               }
             },
             child: const Text('Login'),
