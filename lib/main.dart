@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:alfabetizando_tcc/registrar.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'autent_user.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -17,10 +23,11 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
+          title: const Text('Autenticação'),
         ),
         body: const SingleChildScrollView(
           padding: EdgeInsets.all(20.0),
-          child: RegisterUser(),
+          child: LoginRegisterScreen(),
         ),
       ),
     );
