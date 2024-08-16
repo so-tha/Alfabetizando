@@ -81,7 +81,13 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               ),
               const SizedBox(height: 24.0),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if(_formKey.currentState!.validate()){
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(_isLogin ? 'Efetuando Login...' : 'Registrando...')),
+                    );
+                  }
+                },
                 child: Text(_isLogin ? 'Login' : 'Registrar-se'),
               ),
               TextButton(
