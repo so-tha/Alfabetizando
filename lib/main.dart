@@ -1,4 +1,4 @@
-import 'package:alfabetizando_tcc/auth_screen.dart';
+import 'package:alfabetizando_tcc/authentication_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
