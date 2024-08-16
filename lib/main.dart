@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:alfabetizando_tcc/auth_screen.dart';
+import 'package:alfabetizando_tcc/autent_user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const AuthScreen(),
+      home: const LoginRegisterScreen(),
     );
   }
 }
