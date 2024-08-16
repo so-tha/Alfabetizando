@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:alfabetizando_tcc/registrar.dart';
+import 'package:alfabetizando_tcc/auth_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,14 +15,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-        ),
-        body: const SingleChildScrollView(
-          padding: EdgeInsets.all(20.0),
-          child: RegisterUser(),
-        ),
-      ),
+      home: const AuthScreen(),
     );
   }
 }
