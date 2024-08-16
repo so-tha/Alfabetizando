@@ -40,6 +40,7 @@ class _WelcomeScreen extends State<WelcomeScreen>
                   onPressed: () {},
                   child: const Text('Login'),
                 ),
+                const SizedBox(height: 20,),
                 ElevatedButton(
                   onPressed: () {},
                   child: const Text('Registre-se'),
