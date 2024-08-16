@@ -1,4 +1,5 @@
 import 'package:alfabetizando_tcc/screens/authentication_screen.dart';
+import 'package:alfabetizando_tcc/screens/welcome_screen%20.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const AuthScreen(),
+      home: 
+      const WelcomeScreen(),
     );
   }
 }
