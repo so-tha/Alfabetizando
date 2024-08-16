@@ -12,14 +12,13 @@ class _WelcomeScreen extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold( 
-      appBar: AppBar(),
       body: Stack(
          //permite a sobreposição
         children: [
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('alfabetizando/lib/assets/images/background_image.jpg'),
+                image: AssetImage('/home/thais/Documents/workspace/alfabetizando/lib/assets/images/background_image.jpg'),
                 fit: BoxFit.cover, //toda a pagina
               )
             ),
