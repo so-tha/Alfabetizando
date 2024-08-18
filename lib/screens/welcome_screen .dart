@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'authentication_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -28,22 +29,28 @@ class _WelcomeScreen extends State<WelcomeScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                 Text(
-                  'Alfabetizando',
-                   style: GoogleFonts.theGirlNextDoor(
-                    fontSize: 32,
-                    color: Color.fromRGBO(248, 111, 3, 100),
-                )),
+                Text('Alfabetizando',
+                    style: GoogleFonts.theGirlNextDoor(
+                      fontSize: 32,
+                      color: Color.fromRGBO(248, 111, 3, 100),
+                    )),
                 const SizedBox(
                   height: 20,
                 ),
                 FilledButton(
                   style: ButtonStyle(
-                     backgroundColor: WidgetStatePropertyAll<Color>(const Color.fromRGBO(255, 209, 139, 100)),
-                     padding:
+                    backgroundColor: WidgetStatePropertyAll<Color>(
+                        const Color.fromRGBO(255, 209, 139, 1)),
+                    padding:
                         WidgetStateProperty.all<EdgeInsets>(EdgeInsets.all(20)),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AuthScreen()),
+                    );
+                  },
                   child: const Text('Login'),
                 ),
                 const SizedBox(
