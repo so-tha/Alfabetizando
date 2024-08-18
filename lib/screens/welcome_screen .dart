@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -27,14 +28,12 @@ class _WelcomeScreen extends State<WelcomeScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                 Text(
                   'Alfabetizando',
-                  style: TextStyle(
+                   style: GoogleFonts.theGirlNextDoor(
                     fontSize: 32,
                     color: Color.fromRGBO(248, 111, 3, 100),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                )),
                 const SizedBox(
                   height: 20,
                 ),
