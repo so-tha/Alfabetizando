@@ -31,16 +31,17 @@ class _WelcomeScreen extends State<WelcomeScreen>
                   'Alfabetizando',
                   style: TextStyle(
                     fontSize: 32,
-                    color: Colors.white,
+                    color: Color.fromRGBO(248, 111, 3, 100),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                ElevatedButton(
+                FilledButton(
                   style: ButtonStyle(
-                    padding:
+                     backgroundColor: WidgetStatePropertyAll<Color>(const Color.fromRGBO(255, 209, 139, 100)),
+                     padding:
                         WidgetStateProperty.all<EdgeInsets>(EdgeInsets.all(20)),
                   ),
                   onPressed: () {},
@@ -49,7 +50,7 @@ class _WelcomeScreen extends State<WelcomeScreen>
                 const SizedBox(
                   height: 20,
                 ),
-                ElevatedButton(
+                OutlinedButton(
                   onPressed: () {},
                   child: const Text('Registre-se'),
                 ),
