@@ -47,8 +47,7 @@ class _WelcomeScreen extends State<WelcomeScreen>
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const AuthScreen()),
+                      MaterialPageRoute(builder: (context) => AuthScreen()),
                     );
                   },
                   child: const Text('Login'),
@@ -57,7 +56,12 @@ class _WelcomeScreen extends State<WelcomeScreen>
                   height: 20,
                 ),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AuthScreen(isLogin: false,)),
+                    );
+                  },
                   child: const Text('Registre-se'),
                 ),
               ],
