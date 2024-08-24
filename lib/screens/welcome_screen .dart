@@ -21,7 +21,7 @@ class _WelcomeScreen extends State<WelcomeScreen>
             decoration: const BoxDecoration(
                 image: DecorationImage(
               image: AssetImage(
-                  '/home/thais/Documents/workspace/alfabetizando/lib/assets/images/background_image.jpg'),
+                  '/home/thaithai/Documents/alfabetizando/lib/assets/images/background_image.jpg'),
               fit: BoxFit.cover, //toda a pagina
             )),
           ),
