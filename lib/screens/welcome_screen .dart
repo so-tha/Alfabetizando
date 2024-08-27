@@ -32,17 +32,17 @@ class _WelcomeScreen extends State<WelcomeScreen>
                 Text('Alfabetizando',
                     style: GoogleFonts.theGirlNextDoor(
                       fontSize: 32,
-                      color: Color.fromRGBO(248, 111, 3, 100),
+                      color: const Color.fromRGBO(248, 111, 3, 100),
                     )),
                 const SizedBox(
                   height: 20,
                 ),
                 FilledButton(
                   style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color>(
-                        const Color.fromRGBO(255, 209, 139, 1)),
+                    backgroundColor: const WidgetStatePropertyAll<Color>(
+                        Color.fromRGBO(255, 209, 139, 1)),
                     padding:
-                        WidgetStateProperty.all<EdgeInsets>(EdgeInsets.all(20)),
+                        WidgetStateProperty.all<EdgeInsets>(const EdgeInsets.all(20)),
                   ),
                   onPressed: () {
                     Navigator.push(

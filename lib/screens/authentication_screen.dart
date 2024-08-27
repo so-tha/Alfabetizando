@@ -8,7 +8,8 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
+class _AuthScreenState extends State<AuthScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -28,6 +29,30 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     _isLogin = widget.isLogin;
   }
 
+  InputDecoration _buildInputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: Color(0xFFFFCB7C),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Color(0xFFFFCB7C)),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.red),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,12 +66,10 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!_isLogin) 
+              if (!_isLogin)
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nome',
-                  ),
+                  decoration: _buildInputDecoration('Nome'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, insira seu nome.';
@@ -58,9 +81,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                ),
+                decoration: _buildInputDecoration('Email'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira seu email.';
@@ -76,9 +97,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Senha',
-                ),
+                decoration: _buildInputDecoration('Senha'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira sua senha.';
@@ -89,9 +108,12 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               const SizedBox(height: 24.0),
               ElevatedButton(
                 onPressed: () {
-                  if(_formKey.currentState!.validate()){
+                  if (_formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(_isLogin ? 'Efetuando Login...' : 'Registrando...')),
+                      SnackBar(
+                          content: Text(_isLogin
+                              ? 'Efetuando Login...'
+                              : 'Registrando...')),
                     );
                   }
                 },
@@ -114,4 +136,3 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     );
   }
 }
-
