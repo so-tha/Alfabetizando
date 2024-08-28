@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthScreen extends StatefulWidget {
   bool isLogin;
@@ -54,6 +55,44 @@ class _AuthScreenState extends State<AuthScreen>
       ),
       padding: EdgeInsets.all(16.0),
     );
+  }
+
+  Future<void> _signUp(String email, String password) async {
+    final response = await Supabase.instance.client.auth.signUp(
+      email: email,
+      password: password,
+    );
+
+    if (response.user == null) {
+      // Mostra um erro se a resposta não contiver um usuário
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possivel realizar o login')),
+      );
+    } else {
+      // Sucesso - usuário registrado
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registro bem-sucedido!')),
+      );
+    }
+  }
+
+  Future<void> _signIn(String email, String password) async {
+    final response = await Supabase.instance.client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+
+    if (response.session == null) {
+      // Mostra um erro se a resposta não contiver uma sessão válida
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Não foi possivel realizar o login')),
+      );
+    } else {
+      // Sucesso - usuário logado
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login bem-sucedido!')),
+      );
+    }
   }
 
   @override
@@ -112,12 +151,14 @@ class _AuthScreenState extends State<AuthScreen>
               FilledButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          _isLogin ? 'Efetuando Login...' : 'Registrando...',
-                        ),
-                      ),
+                    FilledButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _signUp(
+                              _emailController.text, _passwordController.text);
+                        }
+                      },
+                      child: Text('Registrar-se'),
                     );
                   }
                 },
@@ -131,7 +172,8 @@ class _AuthScreenState extends State<AuthScreen>
                   });
                 },
                 style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero, // Padding personalizado, se necessário
+                  padding:
+                      EdgeInsets.zero, // Padding personalizado, se necessário
                 ),
                 child: Text(
                   _isLogin
