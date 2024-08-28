@@ -54,8 +54,8 @@ class _AuthScreenState extends State<AuthScreen>
   }
 
    ButtonStyle _buildButtonStyle() {
-    return ElevatedButton.styleFrom(
-      primary: Color(0xFF2F3DDA), // Cor do botão
+    return FilledButton.styleFrom(
+      backgroundColor: (Color.fromRGBO(47, 61, 218, 1)), // Cor do botão
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
@@ -66,7 +66,7 @@ class _AuthScreenState extends State<AuthScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isLogin ? 'Login' : 'Registro'),
+        title: Text(_isLogin ? 'Login' : 'Criar Conta'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -115,7 +115,7 @@ class _AuthScreenState extends State<AuthScreen>
                 },
               ),
               const SizedBox(height: 24.0),
-              ElevatedButton(
+              FilledButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
