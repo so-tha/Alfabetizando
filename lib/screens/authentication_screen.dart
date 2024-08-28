@@ -9,8 +9,7 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen>
-    with SingleTickerProviderStateMixin {
+class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -66,7 +65,7 @@ class _AuthScreenState extends State<AuthScreen>
     if (response.user == null) {
       // Mostra um erro se a resposta não contiver um usuário
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Não foi possivel realizar o login')),
+        SnackBar(content: Text('Não foi possível realizar o registro')),
       );
     } else {
       // Sucesso - usuário registrado
@@ -85,7 +84,7 @@ class _AuthScreenState extends State<AuthScreen>
     if (response.session == null) {
       // Mostra um erro se a resposta não contiver uma sessão válida
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Não foi possivel realizar o login')),
+        SnackBar(content: Text('Não foi possível realizar o login')),
       );
     } else {
       // Sucesso - usuário logado
@@ -151,15 +150,13 @@ class _AuthScreenState extends State<AuthScreen>
               FilledButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    FilledButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _signUp(
-                              _emailController.text, _passwordController.text);
-                        }
-                      },
-                      child: Text('Registrar-se'),
-                    );
+                    if (_isLogin) {
+                      _signIn(
+                          _emailController.text, _passwordController.text);
+                    } else {
+                      _signUp(
+                          _emailController.text, _passwordController.text);
+                    }
                   }
                 },
                 style: _buildButtonStyle(),
@@ -172,8 +169,7 @@ class _AuthScreenState extends State<AuthScreen>
                   });
                 },
                 style: TextButton.styleFrom(
-                  padding:
-                      EdgeInsets.zero, // Padding personalizado, se necessário
+                  padding: EdgeInsets.zero,
                 ),
                 child: Text(
                   _isLogin
@@ -183,7 +179,7 @@ class _AuthScreenState extends State<AuthScreen>
                     color: Color(0xFF4F4F4F),
                     fontSize: 14,
                     fontFamily: 'Nunito',
-                    height: 1.2, // Ajuste de altura da linha
+                    height: 1.2,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
