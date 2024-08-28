@@ -10,18 +10,11 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   late bool _isLogin;
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -53,15 +46,16 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-   ButtonStyle _buildButtonStyle() {
+  ButtonStyle _buildButtonStyle() {
     return FilledButton.styleFrom(
-      backgroundColor: (Color.fromRGBO(47, 61, 218, 1)), // Cor do botão
+      backgroundColor: Color.fromRGBO(47, 61, 218, 1), // Cor do botão
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
-      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+      padding: EdgeInsets.all(16.0),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,12 +114,14 @@ class _AuthScreenState extends State<AuthScreen>
                   if (_formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text(_isLogin
-                              ? 'Efetuando Login...'
-                              : 'Registrando...')),
+                        content: Text(
+                          _isLogin ? 'Efetuando Login...' : 'Registrando...',
+                        ),
+                      ),
                     );
                   }
                 },
+                style: _buildButtonStyle(),
                 child: Text(_isLogin ? 'Login' : 'Registrar-se'),
               ),
               TextButton(
@@ -134,9 +130,21 @@ class _AuthScreenState extends State<AuthScreen>
                     _isLogin = !_isLogin; // Alterna entre login e registro
                   });
                 },
-                child: Text(_isLogin
-                    ? 'Não tem uma conta? Registre-se'
-                    : 'Já tem uma conta? Faça login'),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero, // Padding personalizado, se necessário
+                ),
+                child: Text(
+                  _isLogin
+                      ? 'Não tem uma conta? Registre-se'
+                      : 'Já tem uma conta? Faça login',
+                  style: TextStyle(
+                    color: Color(0xFF4F4F4F),
+                    fontSize: 14,
+                    fontFamily: 'Nunito',
+                    height: 1.2, // Ajuste de altura da linha
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
               ),
             ],
           ),
