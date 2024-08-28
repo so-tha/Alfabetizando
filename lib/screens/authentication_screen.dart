@@ -53,6 +53,15 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
+   ButtonStyle _buildButtonStyle() {
+    return ElevatedButton.styleFrom(
+      primary: Color(0xFF2F3DDA), // Cor do botão
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
