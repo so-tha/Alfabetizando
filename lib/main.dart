@@ -1,13 +1,18 @@
 import 'package:alfabetizando_tcc/screens/welcome_screen%20.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await dotenv.load(fileName: ".env"); // Carrega as variáveis de ambiente do arquivo .env
+  String supabaseUrl = dotenv.get('URL');
+  String supabaseAnonKey = dotenv.get('anonKey');
+
  await Supabase.initialize(
-       url: 'https://bqdmmkkmjblovfvefazq.supabase.co',
-       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxZG1ta2ttamJsb3ZmdmVmYXpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ4NTAyMjYsImV4cCI6MjA0MDQyNjIyNn0.X87eF8w7PxWafWwQUpzSkkTrUK25SZO-b8uBuAEdgZg',
+       url: supabaseUrl,
+       anonKey: supabaseAnonKey,
   );
 
   runApp(const MyApp());

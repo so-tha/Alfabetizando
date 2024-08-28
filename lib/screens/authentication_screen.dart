@@ -48,7 +48,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   ButtonStyle _buildButtonStyle() {
     return FilledButton.styleFrom(
-      backgroundColor: Color.fromRGBO(47, 61, 218, 1), // Cor do botão
+      backgroundColor: Color.fromRGBO(47, 61, 218, 1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
@@ -63,12 +63,10 @@ class _AuthScreenState extends State<AuthScreen> {
     );
 
     if (response.user == null) {
-      // Mostra um erro se a resposta não contiver um usuário
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Não foi possível realizar o registro')),
       );
     } else {
-      // Sucesso - usuário registrado
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registro bem-sucedido!')),
       );
@@ -82,12 +80,10 @@ class _AuthScreenState extends State<AuthScreen> {
     );
 
     if (response.session == null) {
-      // Mostra um erro se a resposta não contiver uma sessão válida
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Não foi possível realizar o login')),
       );
     } else {
-      // Sucesso - usuário logado
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login bem-sucedido!')),
       );
