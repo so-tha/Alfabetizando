@@ -55,7 +55,7 @@ class _AuthScreenState extends State<AuthScreen> {
       padding: EdgeInsets.all(16.0),
     );
   }
-
+//como o meu sistema é pequeno isso pode não ser necessario, pois não existirar duas pessoas tentando fazer login ao mesmo tempo
   Future<void> _signUp(String email, String password) async {
     final response = await Supabase.instance.client.auth.signUp(
       email: email,

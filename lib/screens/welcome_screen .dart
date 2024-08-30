@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 
 class WelcomeScreen extends StatefulWidget {

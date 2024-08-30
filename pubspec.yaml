@@ -36,6 +36,7 @@ dependencies:
 
   flutter_dotenv: ^5.1.0
   google_fonts: ^6.2.1
+  google_sign_in: ^6.2.1
   grouped_list: ^6.0.0
 
 dev_dependencies:
