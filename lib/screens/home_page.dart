@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,21 +9,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<String> categories = [
-    "Animais",
-    "Brinquedos",
-    "Escola",
-    "Família",
-  ];
+  String? userName;
+  String? userPhotoUrl;
 
-  final List<String> imageUrls = [
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/brinquedos.png", // Local para "Animais"
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png", // Local para "Brinquedos"
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png", // Local para "Escola"
-    //"assets/familia.png", // Local para "Família"
-    //"assets/familia.png", // Local para "Família"
-    //"assets/familia.png", // Local para "Família"
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() {
+    final session = Supabase.instance.client.auth.currentSession;
+
+    if (session != null) {
+      final user = session.user;
+      final userMetadata = user.userMetadata;
+
+      userName = userMetadata?['full_name'] ?? user.email; 
+      userPhotoUrl = userMetadata?['avatar_url']; 
+
+      setState(() {}); // Atualiza a UI
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,24 +40,66 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 2.0,
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            return CategoryCard(
-              title: categories[index],
-              imageUrl: imageUrls[index],
-            );
-          },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (userPhotoUrl != null)
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(userPhotoUrl!),
+                  )
+                else
+                  const CircleAvatar(
+                    radius: 20,
+                    child: Icon(Icons.person),
+                  ),
+                const SizedBox(width: 8),
+                Text(
+                  'Olá, ${userName ?? 'usuário'}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 2.0,
+                ),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  return CategoryCard(
+                    title: categories[index],
+                    imageUrl: imageCategoria[index],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  final List<String> categories = [
+    "Animais",
+    "Brinquedos",
+    "Escola",
+
+  ];
+
+  final List<String> imageCategoria = [
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/brinquedos.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png",
+  ];
 }
 
 class CategoryCard extends StatelessWidget {
@@ -57,17 +107,17 @@ class CategoryCard extends StatelessWidget {
   final String imageUrl;
 
   const CategoryCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: ShapeDecoration(
         image: DecorationImage(
-          image: AssetImage(imageUrl), // Usando AssetImage para carregar imagens locais
+          image: AssetImage(imageUrl),
           fit: BoxFit.cover,
         ),
         shape: RoundedRectangleBorder(
