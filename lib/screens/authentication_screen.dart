@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'home_page.dart';
 
 class AuthScreen extends StatefulWidget {
   bool isLogin;
@@ -26,35 +27,36 @@ class _AuthScreenState extends State<AuthScreen> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: Color(0xFFFFCB7C),
+      fillColor: const Color(0xFFFFCB7C),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Color(0xFFFFCB7C)),
+        borderSide: const BorderSide(color: Color(0xFFFFCB7C)),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.red),
+        borderSide: const BorderSide(color: Colors.red),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.red),
+        borderSide: const BorderSide(color: Colors.red),
       ),
     );
   }
 
   ButtonStyle _buildButtonStyle() {
     return FilledButton.styleFrom(
-      backgroundColor: Color.fromRGBO(47, 61, 218, 1),
+      backgroundColor: const Color.fromRGBO(47, 61, 218, 1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
     );
   }
+
 //como o meu sistema é pequeno isso pode não ser necessario, pois não existirar duas pessoas tentando fazer login ao mesmo tempo
   Future<void> _signUp(String email, String password) async {
     final response = await Supabase.instance.client.auth.signUp(
@@ -64,11 +66,13 @@ class _AuthScreenState extends State<AuthScreen> {
 
     if (response.user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Não foi possível realizar o registro')),
+        const SnackBar(content: Text('Não foi possível realizar o registro')),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registro bem-sucedido!')),
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const HomePage (),
+        ),
       );
     }
   }
@@ -81,11 +85,13 @@ class _AuthScreenState extends State<AuthScreen> {
 
     if (response.session == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Não foi possível realizar o login')),
+        const SnackBar(content: Text('Não foi possível realizar o login')),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login bem-sucedido!')),
+            Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const HomePage (),
+        ),
       );
     }
   }
@@ -147,11 +153,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     if (_isLogin) {
-                      _signIn(
-                          _emailController.text, _passwordController.text);
+                      _signIn(_emailController.text, _passwordController.text);
                     } else {
-                      _signUp(
-                          _emailController.text, _passwordController.text);
+                      _signUp(_emailController.text, _passwordController.text);
                     }
                   }
                 },
@@ -171,7 +175,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   _isLogin
                       ? 'Não tem uma conta? Registre-se'
                       : 'Já tem uma conta? Faça login',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFF4F4F4F),
                     fontSize: 14,
                     fontFamily: 'Nunito',
