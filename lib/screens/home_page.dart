@@ -8,7 +8,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
- 
+  // Listas de categorias e imagens locais
   final List<String> categories = [
     "Animais",
     "Brinquedos",
@@ -19,12 +19,12 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final List<String> imageUrls = [
-    "https://via.placeholder.com/138x71", // Placeholder para "Animais"
-    "https://via.placeholder.com/138x71", // Placeholder para "Brinquedos"
-    "https://via.placeholder.com/138x71", // Placeholder para "Escola"
-    "https://via.placeholder.com/138x71", // Placeholder para "Família"
-    "https://via.placeholder.com/138x71", // Placeholder para "Família"
-    "https://via.placeholder.com/138x71", // Placeholder para "Família"
+    "assets/animais.png", // Local para "Animais"
+    "assets/brinquedos.png", // Local para "Brinquedos"
+    "assets/escola.png", // Local para "Escola"
+    //"assets/familia.png", // Local para "Família"
+    //"assets/familia.png", // Local para "Família"
+    //"assets/familia.png", // Local para "Família"
   ];
 
   @override
@@ -70,7 +70,7 @@ class CategoryCard extends StatelessWidget {
     return Container(
       decoration: ShapeDecoration(
         image: DecorationImage(
-          image: NetworkImage(imageUrl),
+          image: AssetImage(imageUrl), // Usando AssetImage para carregar imagens locais
           fit: BoxFit.cover,
         ),
         shape: RoundedRectangleBorder(
