@@ -8,20 +8,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Listas de categorias e imagens locais
   final List<String> categories = [
     "Animais",
     "Brinquedos",
     "Escola",
     "Família",
-    "Família",
-    "Família",
   ];
 
   final List<String> imageUrls = [
-    "assets/animais.png", // Local para "Animais"
-    "assets/brinquedos.png", // Local para "Brinquedos"
-    "assets/escola.png", // Local para "Escola"
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/brinquedos.png", // Local para "Animais"
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png", // Local para "Brinquedos"
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png", // Local para "Escola"
     //"assets/familia.png", // Local para "Família"
     //"assets/familia.png", // Local para "Família"
     //"assets/familia.png", // Local para "Família"
