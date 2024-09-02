@@ -113,6 +113,7 @@ class _HomePageState extends State<HomePage> {
     "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/animais.png",
     "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png",
     "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/familia.png"
   ];
 }
 
