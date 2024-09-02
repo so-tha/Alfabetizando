@@ -38,11 +38,8 @@ class _HomePageState extends State<HomePage> {
 
     if (pickedFile != null) {
       setState(() {
-        _image = File(pickedFile.path);  // Atualiza a imagem no estado
+        _image = File(pickedFile.path);  
       });
-
-      // Aqui você pode salvar a imagem no Supabase
-      // por exemplo, enviando-a para o storage e atualizando o perfil do usuário
     }
   }
 
@@ -60,13 +57,13 @@ class _HomePageState extends State<HomePage> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: _pickImage,  // Ao clicar na imagem, abre a galeria
+                  onTap: _pickImage,  
                   child: CircleAvatar(
                     radius: 40,
                     backgroundImage: _image != null
-                        ? FileImage(_image!)  // Exibe a imagem selecionada
+                        ? FileImage(_image!)  
                         : const AssetImage('assets/placeholder.png')
-                            as ImageProvider, // Placeholder se não houver imagem
+                            as ImageProvider, 
                     child: _image == null
                         ? const Icon(Icons.add_a_photo, size: 40)
                         : null,
@@ -110,7 +107,6 @@ class _HomePageState extends State<HomePage> {
     "Brinquedos",
     "Escola",
     "Família",
-
   ];
 
   final List<String> imageUrls = [
