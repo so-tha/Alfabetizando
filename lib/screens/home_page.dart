@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -47,10 +48,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vamos aprender?'),
+        
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -59,23 +60,23 @@ class _HomePageState extends State<HomePage> {
                 GestureDetector(
                   onTap: _pickImage,  
                   child: CircleAvatar(
-                    radius: 40,
+                    radius: 20,
                     backgroundImage: _image != null
                         ? FileImage(_image!)  
-                        : const AssetImage('assets/placeholder.png')
+                        : const AssetImage('/home/thaithai/Documents/alfabetizando/lib/assets/images/user.png')
                             as ImageProvider, 
                     child: _image == null
-                        ? const Icon(Icons.add_a_photo, size: 40)
+                        ? const Icon(Icons.add_a_photo, size: 20)
                         : null,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Text(
-                  'Olá, ${userName ?? 'usuário'}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  'Olá, ${userName ?? 'Otávio'}',
+                  style: GoogleFonts.nunito(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ) 
                 ),
               ],
             ),
