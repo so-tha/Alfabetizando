@@ -38,6 +38,7 @@ dependencies:
   google_fonts: ^6.2.1
   google_sign_in: ^6.2.1
   grouped_list: ^6.0.0
+  image_picker: ^1.1.2
 
 
 dev_dependencies:

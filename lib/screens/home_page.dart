@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,7 +12,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? userName;
-  String? userPhotoUrl;
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -26,9 +29,20 @@ class _HomePageState extends State<HomePage> {
       final userMetadata = user.userMetadata;
 
       setState(() {
-        userName = userMetadata?['full_name'] ?? user.email;
-        userPhotoUrl = userMetadata?['avatar_url']; 
+        userName = userMetadata?['child_name'];
       });
+    }
+  }
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);  // Atualiza a imagem no estado
+      });
+
+      // Aqui você pode salvar a imagem no Supabase
+      // por exemplo, enviando-a para o storage e atualizando o perfil do usuário
     }
   }
 
@@ -45,17 +59,20 @@ class _HomePageState extends State<HomePage> {
           children: [
             Row(
               children: [
-                if (userPhotoUrl != null)
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(userPhotoUrl!),
-                  )
-                else
-                  const CircleAvatar(
-                    radius: 20,
-                    child: Icon(Icons.person),
+                GestureDetector(
+                  onTap: _pickImage,  // Ao clicar na imagem, abre a galeria
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: _image != null
+                        ? FileImage(_image!)  // Exibe a imagem selecionada
+                        : const AssetImage('assets/placeholder.png')
+                            as ImageProvider, // Placeholder se não houver imagem
+                    child: _image == null
+                        ? const Icon(Icons.add_a_photo, size: 40)
+                        : null,
                   ),
-                const SizedBox(width: 8),
+                ),
+                const SizedBox(width: 16),
                 Text(
                   'Olá, ${userName ?? 'usuário'}',
                   style: const TextStyle(
