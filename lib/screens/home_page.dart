@@ -65,7 +65,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            // Aqui vai o GridView com as categorias
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -98,9 +97,9 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final List<String> imageUrls = [
-    "assets/animais.png",
-    "assets/brinquedos.png",
-    "assets/categoria/escola.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/animais.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png",
   ];
 }
 
@@ -109,10 +108,10 @@ class CategoryCard extends StatelessWidget {
   final String imageUrl;
 
   const CategoryCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
