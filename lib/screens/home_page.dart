@@ -18,17 +18,17 @@ class _HomePageState extends State<HomePage> {
     _loadUserData();
   }
 
-  void _loadUserData() {
+  Future<void> _loadUserData() async {
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session != null) {
       final user = session.user;
       final userMetadata = user.userMetadata;
 
-      userName = userMetadata?['full_name'] ?? user.email; 
-      userPhotoUrl = userMetadata?['avatar_url']; 
-
-      setState(() {}); // Atualiza a UI
+      setState(() {
+        userName = userMetadata?['full_name'] ?? user.email;
+        userPhotoUrl = userMetadata?['avatar_url']; 
+      });
     }
   }
 
@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+            // Aqui vai o GridView com as categorias
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -77,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (context, index) {
                   return CategoryCard(
                     title: categories[index],
-                    imageUrl: imageCategoria[index],
+                    imageUrl: imageUrls[index],
                   );
                 },
               ),
@@ -92,13 +93,14 @@ class _HomePageState extends State<HomePage> {
     "Animais",
     "Brinquedos",
     "Escola",
+    "Família",
 
   ];
 
-  final List<String> imageCategoria = [
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/brinquedos.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png",
+  final List<String> imageUrls = [
+    "assets/animais.png",
+    "assets/brinquedos.png",
+    "assets/categoria/escola.png",
   ];
 }
 
@@ -107,10 +109,10 @@ class CategoryCard extends StatelessWidget {
   final String imageUrl;
 
   const CategoryCard({
-    super.key,
+    Key? key,
     required this.title,
     required this.imageUrl,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -112,10 +112,10 @@ class _AuthScreenState extends State<AuthScreen> {
               if (!_isLogin)
                 TextFormField(
                   controller: _nameController,
-                  decoration: _buildInputDecoration('Nome'),
+                  decoration: _buildInputDecoration('Nome da Crinaça'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor, insira seu nome.';
+                      return 'Por favor, insira o nome da criança.';
                     }
                     return null;
                   },
@@ -124,7 +124,7 @@ class _AuthScreenState extends State<AuthScreen> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: _buildInputDecoration('Email'),
+                decoration: _buildInputDecoration('Email do Responsável'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira seu email.';
