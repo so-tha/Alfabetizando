@@ -1,10 +1,10 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:hive/hive.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,6 +18,8 @@ class _HomePageState extends State<HomePage> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
   bool _isDrawerOpen = false;
+  bool _isLoading = false;
+  final Box cacheBox = Hive.box('cacheBox');
 
   @override
   void initState() {
@@ -26,6 +28,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadUserData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final session = Supabase.instance.client.auth.currentSession;
 
     if (session != null) {
@@ -35,16 +41,32 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         userName = userMetadata?['child_name'];
       });
+      cacheBox.put('userName', userName);
+    } else {
+      setState(() {
+        userName = cacheBox.get('userName', defaultValue: 'Otávio');
+      });
     }
+
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      if (pickedFile != null) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao selecionar a imagem.')),
+      );
     }
   }
 
@@ -56,16 +78,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Caminhos das imagens
+    const String userPlaceholder = 'assets/images/user.png';
+    final List<String> categories = [
+      "Animais",
+      "Brinquedos",
+      "Escola",
+      "Família",
+      "Comidas",
+      "Roupas"
+    ];
+
+    final List<String> imageUrls = [
+      "assets/categorias/animais.png",
+      "assets/categorias/cachorros.png",
+      "assets/categorias/escola.png",
+      "assets/categorias/familia.png",
+      "assets/categorias/comidas.png",
+      "assets/categorias/roupa.png"
+    ];
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const HomePage()),
-            );
+            Navigator.pop(context); // Corrigido para evitar empilhamento
           },
         ),
         actions: [
@@ -85,67 +123,69 @@ class _HomePageState extends State<HomePage> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: _image != null
-                                ? FileImage(_image!)
-                                : const AssetImage(
-                                        '/home/thaithai/Documents/alfabetizando/lib/assets/images/user.png')
-                                    as ImageProvider,
-                            child: _image == null
-                                ? const Icon(Icons.add_a_photo, size: 20)
-                                : null,
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: _pickImage,
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: _image != null
+                                      ? FileImage(_image!)
+                                      : const AssetImage(userPlaceholder)
+                                          as ImageProvider,
+                                  child: _image == null
+                                      ? const Icon(Icons.add_a_photo, size: 20)
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Text('Olá, ${userName ?? 'Otávio'}',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        Text('Olá, ${userName ?? 'Otávio'}',
+                          Text(
+                            'Vamos Aprender?',
                             style: GoogleFonts.nunito(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            )),
-                      ],
-                    ),
-                    Text(
-                      'Vamos Aprender?',
-                      style: GoogleFonts.nunito(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Escolha uma categoria',
+                            style: GoogleFonts.nunito(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 16,
+                                mainAxisSpacing: 16,
+                                childAspectRatio:
+                                    1.0, // Ajuste a relação de aspecto
+                              ),
+                              itemCount: categories.length,
+                              itemBuilder: (context, index) {
+                                return CategoryCard(
+                                  title: categories[index],
+                                  imageUrl: imageUrls[index],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      'Escolha uma categoria',
-                      style: GoogleFonts.nunito(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.0, // Ajuste a relação de aspecto
-                        ),
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          return CategoryCard(
-                            title: categories[index],
-                            imageUrl: imageUrls[index],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),
@@ -176,14 +216,11 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  
                   children: [
-                    
                     Container(
                       width: double.infinity,
                       color: Colors.orange,
                       padding: const EdgeInsets.all(16.0),
-                      
                       child: const Text(
                         'Configurações',
                         style: TextStyle(
@@ -195,19 +232,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 16),
                     ListTile(
-                      title: Text('Áudio e voz'),
+                      title: const Text('Áudio e voz'),
                       onTap: () {
                         // Ação ao clicar em "Áudio e voz"
                       },
                     ),
                     ListTile(
-                      title: Text('Fontes'),
+                      title: const Text('Fontes'),
                       onTap: () {
                         // Ação ao clicar em "Fontes"
                       },
                     ),
                     ListTile(
-                      title: Text('Cartões'),
+                      title: const Text('Cartões'),
                       onTap: () {
                         // Ação ao clicar em "Cartões"
                       },
@@ -221,24 +258,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  final List<String> categories = [
-    "Animais",
-    "Brinquedos",
-    "Escola",
-    "Família",
-    "comidas",
-    "roupas"
-  ];
-
-  final List<String> imageUrls = [
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/animais.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/familia.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/comidas.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/roupa.png"
-  ];
 }
 
 class CategoryCard extends StatelessWidget {

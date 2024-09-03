@@ -1,9 +1,6 @@
-import 'package:alfabetizando_tcc/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'authentication_screen.dart';
-import 'google_auth.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -13,7 +10,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,17 +35,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(height: 20),
                 FilledButton(
                   style: ButtonStyle(
-                    backgroundColor:
-                        const WidgetStatePropertyAll<Color>(
-                            Color.fromRGBO(255, 209, 139, 1)),
+                    backgroundColor: const WidgetStatePropertyAll<Color>(
+                        Color.fromRGBO(255, 209, 139, 1)),
                     padding: WidgetStateProperty.all<EdgeInsets>(
                         const EdgeInsets.all(20)),
                   ),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => AuthScreen()),
+                      MaterialPageRoute(builder: (context) => AuthScreen()),
                     );
                   },
                   child: const Text('Login'),
@@ -69,7 +63,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
 
                   },
                   child: const Text("Faça Login com o Google"),
