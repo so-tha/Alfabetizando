@@ -120,13 +120,17 @@ class _HomePageState extends State<HomePage> {
     "Brinquedos",
     "Escola",
     "Família",
+    "comidas",
+    "roupas"
   ];
 
   final List<String> imageUrls = [
     "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/animais.png",
     "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/cachorros.png",
     "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/escola.png",
-    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/familia.png"
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/familia.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/comidas.png",
+    "/home/thaithai/Documents/alfabetizando/lib/assets/categorias/roupa.png"
   ];
 }
 
