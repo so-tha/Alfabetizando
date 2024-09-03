@@ -1,6 +1,8 @@
+import 'package:alfabetizando_tcc/main.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'home_page.dart';
+
 
 class AuthScreen extends StatefulWidget {
   bool isLogin;
@@ -15,12 +17,18 @@ class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+   String? _userId;
   late bool _isLogin;
 
   @override
   void initState() {
     super.initState();
     _isLogin = widget.isLogin;
+        supabase.auth.onAuthStateChange.listen((data) {
+      setState(() {
+        _userId = data.session?.user.id;
+      });
+    });
   }
 
   InputDecoration _buildInputDecoration(String label) {
@@ -70,7 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const HomePage (),
+          builder: (context) => const HomePage(),
         ),
       );
     }
@@ -87,9 +95,9 @@ class _AuthScreenState extends State<AuthScreen> {
         const SnackBar(content: Text('Não foi possível realizar o login')),
       );
     } else {
-            Navigator.of(context).push(
+      Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const HomePage (),
+          builder: (context) => const HomePage(),
         ),
       );
     }
@@ -98,95 +106,103 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isLogin ? 'Login' : 'Criar Conta'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!_isLogin)
-                TextFormField(
-                  controller: _nameController,
-                  decoration: _buildInputDecoration('Nome da Crinaça'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira o nome da criança.';
-                    }
-                    return null;
-                  },
-                ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: _buildInputDecoration('Email do Responsável'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira seu email.';
-                  } else if (!RegExp(
-                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+")
-                      .hasMatch(value)) {
-                    return 'Por favor, insira um email válido.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: _buildInputDecoration('Senha'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira sua senha.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24.0),
-              FilledButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    if (_isLogin) {
-                      _signIn(_emailController.text, _passwordController.text);
-                    } else {
-                      _signUp(_emailController.text, _passwordController.text);
-                    }
-                  }
-                },
-                style: _buildButtonStyle(),
-                child: Text(_isLogin ? 'Login' : 'Registrar-se'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isLogin = !_isLogin; // Alterna entre login e registro
-                  });
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                ),
-                child: Text(
-                  _isLogin
-                      ? 'Não tem uma conta? Registre-se'
-                      : 'Já tem uma conta? Faça login',
-                  style: const TextStyle(
-                    color: Color(0xFF4F4F4F),
-                    fontSize: 14,
-                    fontFamily: 'Nunito',
-                    height: 1.2,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        appBar: AppBar(
+          title: Text(_isLogin ? 'Login' : 'Criar Conta'),
         ),
-      ),
-    );
+        body: Stack(children: [
+          Container(
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(255, 246, 244, 1.0)
+            )
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!_isLogin)
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: _buildInputDecoration('Nome da Crinaça'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, insira o nome da criança.';
+                        }
+                        return null;
+                      },
+                    ),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: _buildInputDecoration('Email do Responsável'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu email.';
+                      } else if (!RegExp(
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+")
+                          .hasMatch(value)) {
+                        return 'Por favor, insira um email válido.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: _buildInputDecoration('Senha'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira sua senha.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24.0),
+                  FilledButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        if (_isLogin) {
+                          _signIn(
+                              _emailController.text, _passwordController.text);
+                        } else {
+                          _signUp(
+                              _emailController.text, _passwordController.text);
+                        }
+                      }
+                    },
+                    style: _buildButtonStyle(),
+                    child: Text(_isLogin ? 'Login' : 'Registrar-se'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _isLogin = !_isLogin; // Alterna entre login e registro
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: Text(
+                      _isLogin
+                          ? 'Não tem uma conta? Registre-se'
+                          : 'Já tem uma conta? Faça login',
+                      style: const TextStyle(
+                        color: Color(0xFF4F4F4F),
+                        fontSize: 14,
+                        fontFamily: 'Nunito',
+                        height: 1.2,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ]));
   }
 }

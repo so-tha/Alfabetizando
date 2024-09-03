@@ -1,5 +1,7 @@
+import 'package:alfabetizando_tcc/main.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'authentication_screen.dart';
 import 'google_auth.dart';
 
@@ -11,7 +13,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final GoogleAuth _googleAuth = GoogleAuth();
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    _googleAuth.signInWithGoogle();
+
                   },
                   child: const Text("Faça Login com o Google"),
                 ),
