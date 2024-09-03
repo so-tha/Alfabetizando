@@ -47,9 +47,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        
-      ),
+      appBar: AppBar(),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -70,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                         : null,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 20),
                 Text(
                   'Olá, ${userName ?? 'Otávio'}',
                   style: GoogleFonts.nunito(
@@ -79,6 +77,20 @@ class _HomePageState extends State<HomePage> {
                   ) 
                 ),
               ],
+            ),
+            Text(
+              'Vamos Aprender?',
+              style: GoogleFonts.nunito(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'Escolha uma categoria',
+              style: GoogleFonts.nunito(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,  
+              ),
             ),
             Expanded(
               child: GridView.builder(
