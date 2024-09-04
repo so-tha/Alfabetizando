@@ -73,7 +73,6 @@ flutter:
     - lib/assets/categorias/animais.png
     - lib/assets/categorias/cachorros.png
     - lib/assets/categorias/escola.png
-    - lib/assets/categorias/familia.png
     - lib/assets/categorias/comidas.png
     - lib/assets/categorias/roupa.png
     - lib/assets/images/background_image.jpg

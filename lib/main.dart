@@ -15,6 +15,9 @@ void main() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+      authOptions: const FlutterAuthClientOptions(
+    authFlowType: AuthFlowType.pkce, 
+  )
   );
   await Hive.initFlutter();
   await Hive.openBox('cacheBox');
