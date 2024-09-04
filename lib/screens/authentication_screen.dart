@@ -81,7 +81,7 @@ class _AuthScreenState extends State<AuthScreen> {
         await Supabase.instance.client.from('users').insert({
           'id': userId,
           'email': email,
-          'name': name,
+          'child_name': name,
         });
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -116,20 +116,28 @@ class _AuthScreenState extends State<AuthScreen> {
       if (response.session != null) {
         final userId = response.user!.id;
         final name = _nameController.text;
-        final userExists = await Supabase.instance.client.from('users').select()
-          .eq('id', userId)
-          .single();
 
-        if (userExists.onError == null ) {
+        // Consultar o usuário
+        final userQuery = await Supabase.instance.client
+            .from('users')
+            .select()
+            .eq('id', userId)
+            .single()
+            .maybeSingle();
+
+        // Verificar se houve um erro na consulta ou se o resultado é nulo
+        if (userQuery != null) {
+          // Usuário existe, faça a atualização
           await Supabase.instance.client.from('users').update({
             'email': email,
-            'name': name,
+            'child_name': name,
           }).eq('id', userId);
         } else {
+          // Usuário não existe, faça a inserção
           await Supabase.instance.client.from('users').insert({
             'id': userId,
             'email': email,
-            'name': name,
+            'child_name': name,
           });
         }
 
