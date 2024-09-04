@@ -117,20 +117,20 @@ class _AuthScreenState extends State<AuthScreen> {
       final userId = response.user!.id;
       final name = _nameController.text;
 
-      // Consultar o usuário existente
+      
       final userQuery = await Supabase.instance.client.from('users').select()
         .eq('id', userId)
         .single()
         .maybeSingle();
 
       if (userQuery != null) {
-        // Usuário existe, faça a atualização
+        
         await Supabase.instance.client.from('users').update({
           'email': email,
           'child_name': name,
         }).eq('id', userId);
       } 
-      
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const HomePage(),
