@@ -1,4 +1,3 @@
-import 'package:alfabetizando_tcc/main.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'home_page.dart';
@@ -18,7 +17,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final _passwordController = TextEditingController();
   String? _userId;
   late bool _isLogin;
-  bool _isLoading = false; 
+  bool _isLoading = false;
+  String errorMessage = '';
 
   @override
   void initState() {
@@ -65,31 +65,41 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Future<void> _signUp(String email, String password) async {
+  Future<void> _signUp(String email, String password, String name) async {
     setState(() {
       _isLoading = true;
     });
 
-    final response = await Supabase.instance.client.auth.signUp(
-      email: email,
-      password: password,
-    );
+    try {
+      final response = await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+      );
 
-    if (response.user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível realizar o registro')),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
+      if (response.user != null) {
+        final userId = response.user!.id;
+        await Supabase.instance.client.from('users').insert({
+          'id': userId,
+          'email': email,
+          'name': name,
+        });
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+      } else {
+        _handleError('Não foi possível realizar o registro');
+      }
+    } on AuthException catch (e) {
+      _handleError(e.message);
+    } catch (e) {
+      _handleError('Ocorreu um erro inesperado');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _signIn(String email, String password) async {
@@ -97,38 +107,74 @@ class _AuthScreenState extends State<AuthScreen> {
       _isLoading = true;
     });
 
-    final response = await Supabase.instance.client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      final response = await Supabase.instance.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
 
-    if (response.session == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível realizar o login')),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
+      if (response.session != null) {
+        final userId = response.user!.id;
+        final name = _nameController.text;
+        final userExists = await Supabase.instance.client.from('users').select()
+          .eq('id', userId)
+          .single();
+
+        if (userExists.onError == null ) {
+          await Supabase.instance.client.from('users').update({
+            'email': email,
+            'name': name,
+          }).eq('id', userId);
+        } else {
+          await Supabase.instance.client.from('users').insert({
+            'id': userId,
+            'email': email,
+            'name': name,
+          });
+        }
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+      } else {
+        _handleError('Não foi possível realizar o login');
+      }
+    } on AuthException catch (e) {
+      _handleError(e.message);
+    } catch (e) {
+      print(e);
+      _handleError('Ocorreu um erro inesperado');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
 
+  void _handleError(String message) {
     setState(() {
-      _isLoading = false;
+      errorMessage = message;
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(_isLogin ? 'Login' : 'Criar Conta'),
-        ),
-        body: Stack(children: [
+      appBar: AppBar(
+        title: Text(_isLogin ? 'Login' : 'Criar Conta'),
+      ),
+      body: Stack(
+        children: [
           Container(
-              decoration: const BoxDecoration(
-                  color: Color.fromRGBO(255, 246, 244, 1.0))),
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(255, 246, 244, 1.0),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: _isLoading
@@ -142,7 +188,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           if (!_isLogin)
                             TextFormField(
                               controller: _nameController,
-                              decoration: _buildInputDecoration('Nome da Criança'),
+                              decoration:
+                                  _buildInputDecoration('Nome da Criança'),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor, insira o nome da criança.';
@@ -189,19 +236,21 @@ class _AuthScreenState extends State<AuthScreen> {
                                   _signIn(_emailController.text,
                                       _passwordController.text);
                                 } else {
-                                  _signUp(_emailController.text,
-                                      _passwordController.text);
+                                  _signUp(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                    _nameController.text,
+                                  );
                                 }
                               }
                             },
                             style: _buildButtonStyle(),
-                            child:
-                                Text(_isLogin ? 'Login' : 'Registrar-se'),
+                            child: Text(_isLogin ? 'Login' : 'Registrar-se'),
                           ),
                           TextButton(
                             onPressed: () {
                               setState(() {
-                                _isLogin = !_isLogin; // Alterna entre login e registro
+                                _isLogin = !_isLogin;
                               });
                             },
                             style: TextButton.styleFrom(
@@ -220,11 +269,21 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                             ),
                           ),
+                          if (errorMessage.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                errorMessage,
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            ),
                         ],
                       ),
                     ),
                   ),
           ),
-        ]));
+        ],
+      ),
+    );
   }
 }

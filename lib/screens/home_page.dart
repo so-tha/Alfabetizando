@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:hive/hive.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   final ImagePicker _picker = ImagePicker();
   bool _isDrawerOpen = false;
   bool _isLoading = false;
-  final Box cacheBox = Hive.box('cacheBox');
+
 
   @override
   void initState() {
@@ -41,11 +41,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         userName = userMetadata?['child_name'];
       });
-      cacheBox.put('userName', userName);
-    } else {
-      setState(() {
-        userName = cacheBox.get('userName', defaultValue: 'Otávio');
-      });
+  
     }
 
 
@@ -78,8 +74,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Caminhos das imagens
-    const String userPlaceholder = 'assets/images/user.png';
+    
+    const String userPlaceholder = 'assets/images/icon.png';
     final List<String> categories = [
       "Animais",
       "Brinquedos",
@@ -103,7 +99,7 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Corrigido para evitar empilhamento
+            Navigator.pop(context); 
           },
         ),
         actions: [
@@ -116,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(60.0), // Bordas arredondadas
+            borderRadius: BorderRadius.circular(60.0), 
             child: Container(
               decoration: const BoxDecoration(
                 color: Color.fromRGBO(255, 246, 244, 1.0),
@@ -173,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisSpacing: 16,
                                 mainAxisSpacing: 16,
                                 childAspectRatio:
-                                    1.0, // Ajuste a relação de aspecto
+                                    1.0, 
                               ),
                               itemCount: categories.length,
                               itemBuilder: (context, index) {
@@ -202,7 +198,7 @@ class _HomePageState extends State<HomePage> {
             ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
-            right: _isDrawerOpen ? 0 : -300, // Largura da metade da tela
+            right: _isDrawerOpen ? 0 : -300, 
             top: 0,
             bottom: 0,
             child: Material(
@@ -293,10 +289,10 @@ class CategoryCard extends StatelessWidget {
               ),
             ],
           ),
-          height: 100, // Altura fixa para o card da imagem
+          height: 100,
           width: double.infinity,
         ),
-        const SizedBox(height: 8), // Espaço entre a imagem e o texto
+        const SizedBox(height: 8), 
         Text(
           title,
           style: const TextStyle(
