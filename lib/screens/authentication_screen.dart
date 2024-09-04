@@ -102,64 +102,55 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  Future<void> _signIn(String email, String password) async {
-    setState(() {
-      _isLoading = true;
-    });
+ Future<void> _signIn(String email, String password) async {
+  setState(() {
+    _isLoading = true;
+  });
 
-    try {
-      final response = await Supabase.instance.client.auth.signInWithPassword(
-        email: email,
-        password: password,
+  try {
+    final response = await Supabase.instance.client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+
+    if (response.session != null) {
+      final userId = response.user!.id;
+      final name = _nameController.text;
+
+      // Consultar o usuário existente
+      final userQuery = await Supabase.instance.client.from('users').select()
+        .eq('id', userId)
+        .single()
+        .maybeSingle();
+
+      if (userQuery != null) {
+        // Usuário existe, faça a atualização
+        await Supabase.instance.client.from('users').update({
+          'email': email,
+          'child_name': name,
+        }).eq('id', userId);
+      } 
+      
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
       );
-
-      if (response.session != null) {
-        final userId = response.user!.id;
-        final name = _nameController.text;
-
-        // Consultar o usuário
-        final userQuery = await Supabase.instance.client
-            .from('users')
-            .select()
-            .eq('id', userId)
-            .single()
-            .maybeSingle();
-
-        // Verificar se houve um erro na consulta ou se o resultado é nulo
-        if (userQuery != null) {
-          // Usuário existe, faça a atualização
-          await Supabase.instance.client.from('users').update({
-            'email': email,
-            'child_name': name,
-          }).eq('id', userId);
-        } else {
-          // Usuário não existe, faça a inserção
-          await Supabase.instance.client.from('users').insert({
-            'id': userId,
-            'email': email,
-            'child_name': name,
-          });
-        }
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const HomePage(),
-          ),
-        );
-      } else {
-        _handleError('Não foi possível realizar o login');
-      }
-    } on AuthException catch (e) {
-      _handleError(e.message);
-    } catch (e) {
-      print(e);
-      _handleError('Ocorreu um erro inesperado');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    } else {
+      _handleError('Não foi possível realizar o login');
     }
+  } on AuthException catch (e) {
+    _handleError(e.message);
+  } catch (e) {
+    print(e);
+    _handleError('Ocorreu um erro inesperado');
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 
   void _handleError(String message) {
     setState(() {
