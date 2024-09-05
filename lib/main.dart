@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(
-      fileName: ".env"); // Carrega as variáveis de ambiente do arquivo .env
+      fileName: ".env"); 
   String supabaseUrl = dotenv.get('URL');
   String supabaseAnonKey = dotenv.get('anonKey');
 
@@ -24,7 +24,7 @@ void main() async {
   runApp(const MyApp());
 }
 
-final supabase = Supabase.instance.client; //acessar de forma mais simples
+final supabase = Supabase.instance.client; 
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

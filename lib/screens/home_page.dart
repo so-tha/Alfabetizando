@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Expanded(
                             child: FutureBuilder<List<Category>>(
-                              future: _categoriesFuture, // Futuro que busca as categorias
+                              future: _categoriesFuture, 
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
                                   return const Center(
