@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import '../data/cards.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,12 +19,13 @@ class _HomePageState extends State<HomePage> {
   final ImagePicker _picker = ImagePicker();
   bool _isDrawerOpen = false;
   bool _isLoading = false;
-
+  late Future<List<Category>> _categoriesFuture;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _categoriesFuture = fetchCategories();
   }
 
   Future<void> _loadUserData() async {
@@ -75,24 +76,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     
-    const String userPlaceholder = 'assets/images/icon.png';
-    final List<String> categories = [
-      "Animais",
-      "Brinquedos",
-      "Escola",
-      "Família",
-      "Comidas",
-      "Roupas"
-    ];
-
-    final List<String> imageUrls = [
-      "assets/categorias/animais.png",
-      "assets/categorias/cachorros.png",
-      "assets/categorias/escola.png",
-      "assets/categorias/familia.png",
-      "assets/categorias/comidas.png",
-      "assets/categorias/roupa.png"
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -132,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                                   radius: 20,
                                   backgroundImage: _image != null
                                       ? FileImage(_image!)
-                                      : const AssetImage(userPlaceholder)
+                                      : const AssetImage('lib/assets/images/icon.jpg')
                                           as ImageProvider,
                                   child: _image == null
                                       ? const Icon(Icons.add_a_photo, size: 20)
@@ -162,21 +145,39 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio:
-                                    1.0, 
-                              ),
-                              itemCount: categories.length,
-                              itemBuilder: (context, index) {
-                                return CategoryCard(
-                                  title: categories[index],
-                                  imageUrl: imageUrls[index],
-                                );
+                            child: FutureBuilder<List<Category>>(
+                              future: _categoriesFuture, // Futuro que busca as categorias
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('Erro: ${snapshot.error}'));
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return const Center(
+                                      child: Text('Nenhuma categoria encontrada.'));
+                                } else {
+                                  final categories = snapshot.data!;
+                                  return GridView.builder(
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 1.0,
+                                    ),
+                                    itemCount: categories.length,
+                                    itemBuilder: (context, index) {
+                                      final category = categories[index];
+                                      return CategoryCard(
+                                        title: category.title,
+                                        imageUrl: category.imageUrl,
+                                      );
+                                    },
+                                  );
+                                }
                               },
                             ),
                           ),

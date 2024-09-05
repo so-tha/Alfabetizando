@@ -1,9 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:convert';
 
-// Defina a classe de modelo do card
+
 class Category {
-  final String id;
+  final int id;
   final String title;
   final String imageUrl;
 
@@ -11,7 +11,7 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['id'] as String,
+      id: json['id'] as int,
       title: json['title'] as String,
       imageUrl: json['image_url'] as String,
     );
@@ -32,8 +32,10 @@ Future<List<Category>> fetchCategories() async {
       .from('cards')
       .select();
 
+
   if (response.isEmpty) {
     throw Exception('Nenhuma categoria encontrada.');
+    
   }
 
   final List<dynamic> data = response as List<dynamic>;
