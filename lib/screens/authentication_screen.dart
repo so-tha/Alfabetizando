@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'home_page.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isLogin;
-  const AuthScreen({this.isLogin = true, super.key});
+  final Box box;
+  const AuthScreen({this.isLogin = true, required this.box, super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -15,6 +17,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  // ignore: unused_field
   String? _userId;
   late bool _isLogin;
   bool _isLoading = false;
@@ -85,7 +88,7 @@ class _AuthScreenState extends State<AuthScreen> {
         });
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const HomePage(),
+            builder: (context) => HomePage(box: widget.box),
           ),
         );
       } else {
@@ -102,55 +105,54 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
- Future<void> _signIn(String email, String password) async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    final response = await Supabase.instance.client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-
-    if (response.session != null) {
-      final userId = response.user!.id;
-      final name = _nameController.text;
-
-      
-      final userQuery = await Supabase.instance.client.from('users').select()
-        .eq('id', userId)
-        .single()
-        .maybeSingle();
-
-      if (userQuery != null) {
-        
-        await Supabase.instance.client.from('users').update({
-          'email': email,
-          'child_name': name,
-        }).eq('id', userId);
-      } 
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
-    } else {
-      _handleError('Não foi possível realizar o login');
-    }
-  } on AuthException catch (e) {
-    _handleError(e.message);
-  } catch (e) {
-    print(e);
-    _handleError('Ocorreu um erro inesperado');
-  } finally {
+  Future<void> _signIn(String email, String password) async {
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
-  }
-}
 
+    try {
+      final response = await Supabase.instance.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.session != null) {
+        final userId = response.user!.id;
+        final name = _nameController.text;
+
+        final userQuery = await Supabase.instance.client
+            .from('users')
+            .select()
+            .eq('id', userId)
+            .single()
+            .maybeSingle();
+
+        if (userQuery != null) {
+          await Supabase.instance.client.from('users').update({
+            'email': email,
+            'child_name': name,
+          }).eq('id', userId);
+        }
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomePage(box: widget.box),
+          ),
+        );
+      } else {
+        _handleError('Não foi possível realizar o login');
+      }
+    } on AuthException catch (e) {
+      _handleError(e.message);
+    } catch (e) {
+      print(e);
+      _handleError('Ocorreu um erro inesperado');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   void _handleError(String message) {
     setState(() {
@@ -160,6 +162,7 @@ class _AuthScreenState extends State<AuthScreen> {
       SnackBar(content: Text(message)),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -5,9 +5,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../data/cards.dart';
+import 'package:hive/hive.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Box box;
+  const HomePage({required this.box});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,12 +22,30 @@ class _HomePageState extends State<HomePage> {
   bool _isDrawerOpen = false;
   bool _isLoading = false;
   late Future<List<Category>> _categoriesFuture;
+  String? _cachedData;
 
   @override
   void initState() {
     super.initState();
+    _loadData();
     _loadUserData();
     _categoriesFuture = fetchCategories();
+  }
+
+  void _loadData() async {
+    var cachedCategories = widget.box.get('categories');
+
+    if(cachedCategories != null){
+      setState(() {
+        _categoriesFuture = Future.value(cachedCategories);
+      });
+    } else{
+      _categoriesFuture = fetchCategories().then((categories){
+        widget.box.put('categories', categories);
+        return categories;
+      });
+    }
+
   }
 
   Future<void> _loadUserData() async {
@@ -44,7 +64,6 @@ class _HomePageState extends State<HomePage> {
       });
   
     }
-
 
     setState(() {
       _isLoading = false;
@@ -75,8 +94,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

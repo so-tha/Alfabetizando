@@ -1,13 +1,23 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+// ignore_for_file: depend_on_referenced_packages
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hive/hive.dart';
+
+part 'cards.g.dart';
+
+@HiveType(typeId: 0)
 
 class Category {
+  @HiveField(0)
   final int id;
+  
+  @HiveField(1)
   final String title;
+  
+  @HiveField(2)
   final String imageUrl;
 
   Category({required this.id, required this.title, required this.imageUrl});
-
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'] as int,
@@ -23,18 +33,15 @@ class Category {
       'image_url': imageUrl,
     };
   }
+
+  
 }
 
-
 Future<List<Category>> fetchCategories() async {
-  final response = await Supabase.instance.client
-      .from('cards')
-      .select();
-
+  final response = await Supabase.instance.client.from('cards').select();
 
   if (response.isEmpty) {
     throw Exception('Nenhuma categoria encontrada.');
-    
   }
 
   final List<dynamic> data = response as List<dynamic>;
@@ -42,7 +49,6 @@ Future<List<Category>> fetchCategories() async {
       .map((json) => Category.fromJson(json as Map<String, dynamic>))
       .toList();
 }
-
 
 Future<void> addCategory(Category category) async {
   final response =
@@ -52,8 +58,6 @@ Future<void> addCategory(Category category) async {
     throw Exception('Erro ao adicionar categoria: ${response.error!.message}');
   }
 }
-
-
 
 Future<void> updateCategory(Category category) async {
   final response = await Supabase.instance.client
@@ -65,7 +69,6 @@ Future<void> updateCategory(Category category) async {
     throw Exception('Erro ao atualizar categoria: ${response.error!.message}');
   }
 }
-
 
 Future<void> deleteCategory(String id) async {
   final response =

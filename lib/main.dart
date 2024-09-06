@@ -1,8 +1,10 @@
+import 'package:alfabetizando_tcc/data/cards.dart';
 import 'package:alfabetizando_tcc/screens/welcome_screen%20.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,14 +22,16 @@ void main() async {
   )
   );
   await Hive.initFlutter();
-  await Hive.openBox('cacheBox');
-  runApp(const MyApp());
+  Hive.registerAdapter(CategoryAdapter());
+  final box = await Hive.openBox('MyCacheBox');
+  runApp( MyApp(box: box));
 }
 
 final supabase = Supabase.instance.client; 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Box box;
+  const MyApp({required this.box});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const WelcomeScreen(),
+      home: WelcomeScreen(box:box),
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'authentication_screen.dart';
+import 'package:hive/hive.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key});
+  final Box box;
+  const WelcomeScreen({Key? key, required this.box}) : super(key: key);
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -43,7 +45,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AuthScreen()),
+                      MaterialPageRoute(builder: (context) => AuthScreen(box: widget.box)),
                     );
                   },
                   child: const Text('Login'),
@@ -55,7 +57,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => AuthScreen(
-                                isLogin: false,
+                                isLogin: false, box: widget.box
                               )),
                     );
                   },
