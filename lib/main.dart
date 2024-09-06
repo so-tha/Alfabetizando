@@ -6,13 +6,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(
       fileName: ".env"); 
-  String supabaseUrl = dotenv.get('URL');
-  String supabaseAnonKey = dotenv.get('anonKey');
+  final supabaseUrl = dotenv.get('URL');
+  final supabaseAnonKey = dotenv.get('anonKey');
 
   await Supabase.initialize(
     url: supabaseUrl,
@@ -24,16 +25,17 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CategoryAdapter());
   final box = await Hive.openBox('MyCacheBox');
-  await syncData();
+  await syncData(box);
   runApp( MyApp(box: box));
 }
 
-final supabase = Supabase.instance.client; 
-
-Future<void> syncData() async {
+Future<void> syncData(Box box) async { 
   try {
     final categories = await fetchCategories();
-    
+    await box.clear(); 
+    for (var category in categories) {
+      await box.put(category.id, category); 
+    }
   } catch (e) {
     print('Erro ao sincronizar dados: $e');
   }
