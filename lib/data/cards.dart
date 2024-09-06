@@ -6,14 +6,13 @@ import 'package:hive/hive.dart';
 part 'cards.g.dart';
 
 @HiveType(typeId: 0)
-
 class Category {
   @HiveField(0)
   final int id;
-  
+
   @HiveField(1)
   final String title;
-  
+
   @HiveField(2)
   final String imageUrl;
 
@@ -33,8 +32,6 @@ class Category {
       'image_url': imageUrl,
     };
   }
-
-  
 }
 
 Future<List<Category>> fetchCategories() async {
@@ -57,6 +54,8 @@ Future<void> addCategory(Category category) async {
   if (response.error != null) {
     throw Exception('Erro ao adicionar categoria: ${response.error!.message}');
   }
+  final box = await Hive.openBox<Category>('categories');
+  box.add(category);
 }
 
 Future<void> updateCategory(Category category) async {
@@ -68,6 +67,14 @@ Future<void> updateCategory(Category category) async {
   if (response.error != null) {
     throw Exception('Erro ao atualizar categoria: ${response.error!.message}');
   }
+  final box = await Hive.openBox<Category>('categories');
+  final existingCategory = box.get(category.id);
+
+  if (existingCategory != null) {
+    await box.put(category.id, category);
+  } else {
+    throw Exception('Categoria não encontrada no Hive para atualização');
+  }
 }
 
 Future<void> deleteCategory(String id) async {
@@ -76,5 +83,10 @@ Future<void> deleteCategory(String id) async {
 
   if (response.error != null) {
     throw Exception('Erro ao remover categoria: ${response.error!.message}');
+  }
+  final box = await Hive.openBox<Category>('categories');
+  final category = box.get(id);
+  if (category != null) {
+    await box.delete(id);
   }
 }

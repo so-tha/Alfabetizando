@@ -248,19 +248,19 @@ class _HomePageState extends State<HomePage> {
                     ListTile(
                       title: const Text('Áudio e voz'),
                       onTap: () {
-                        // Ação ao clicar em "Áudio e voz"
+                       
                       },
                     ),
                     ListTile(
                       title: const Text('Fontes'),
                       onTap: () {
-                        // Ação ao clicar em "Fontes"
+                        
                       },
                     ),
                     ListTile(
                       title: const Text('Cartões'),
                       onTap: () {
-                        // Ação ao clicar em "Cartões"
+                        
                       },
                     ),
                   ],

@@ -24,10 +24,21 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CategoryAdapter());
   final box = await Hive.openBox('MyCacheBox');
+  await syncData();
   runApp( MyApp(box: box));
 }
 
 final supabase = Supabase.instance.client; 
+
+Future<void> syncData() async {
+  try {
+    final categories = await fetchCategories();
+    
+  } catch (e) {
+    print('Erro ao sincronizar dados: $e');
+  }
+}
+
 
 class MyApp extends StatelessWidget {
   final Box box;

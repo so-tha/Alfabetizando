@@ -6,6 +6,7 @@ import 'home_page.dart';
 class AuthScreen extends StatefulWidget {
   final bool isLogin;
   final Box box;
+
   const AuthScreen({this.isLogin = true, required this.box, super.key});
 
   @override
@@ -17,7 +18,6 @@ class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  // ignore: unused_field
   String? _userId;
   late bool _isLogin;
   bool _isLoading = false;
@@ -117,23 +117,6 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       if (response.session != null) {
-        final userId = response.user!.id;
-        final name = _nameController.text;
-
-        final userQuery = await Supabase.instance.client
-            .from('users')
-            .select()
-            .eq('id', userId)
-            .single()
-            .maybeSingle();
-
-        if (userQuery != null) {
-          await Supabase.instance.client.from('users').update({
-            'email': email,
-            'child_name': name,
-          }).eq('id', userId);
-        }
-
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => HomePage(box: widget.box),
@@ -145,7 +128,6 @@ class _AuthScreenState extends State<AuthScreen> {
     } on AuthException catch (e) {
       _handleError(e.message);
     } catch (e) {
-      print(e);
       _handleError('Ocorreu um erro inesperado');
     } finally {
       setState(() {
@@ -162,7 +144,6 @@ class _AuthScreenState extends State<AuthScreen> {
       SnackBar(content: Text(message)),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -235,8 +216,10 @@ class _AuthScreenState extends State<AuthScreen> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 if (_isLogin) {
-                                  _signIn(_emailController.text,
-                                      _passwordController.text);
+                                  _signIn(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                  );
                                 } else {
                                   _signUp(
                                     _emailController.text,
