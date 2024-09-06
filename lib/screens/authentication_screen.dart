@@ -18,7 +18,6 @@ class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String? _userId;
   late bool _isLogin;
   bool _isLoading = false;
   String errorMessage = '';
@@ -29,7 +28,6 @@ class _AuthScreenState extends State<AuthScreen> {
     _isLogin = widget.isLogin;
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       setState(() {
-        _userId = data.session?.user.id;
       });
     });
   }

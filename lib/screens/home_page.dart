@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> {
   bool _isDrawerOpen = false;
   bool _isLoading = false;
   late Future<List<Category>> _categoriesFuture;
-  String? _cachedData;
 
   @override
   void initState() {
