@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'home_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    hide AuthException; // Escondendo AuthException do Supabase
+import '../widgets/home_page.dart';
+import '../controllers/auth_controller.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isLogin;
@@ -21,14 +23,14 @@ class _AuthScreenState extends State<AuthScreen> {
   late bool _isLogin;
   bool _isLoading = false;
   String errorMessage = '';
+  final AuthController _authController = AuthController();
 
   @override
   void initState() {
     super.initState();
     _isLogin = widget.isLogin;
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      setState(() {
-      });
+      setState(() {});
     });
   }
 
@@ -72,26 +74,12 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      final response = await Supabase.instance.client.auth.signUp(
-        email: email,
-        password: password,
+      await _authController.signUp(email, password, name);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => HomePage(box: widget.box),
+        ),
       );
-
-      if (response.user != null) {
-        final userId = response.user!.id;
-        await Supabase.instance.client.from('users').insert({
-          'id': userId,
-          'email': email,
-          'child_name': name,
-        });
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => HomePage(box: widget.box),
-          ),
-        );
-      } else {
-        _handleError('Não foi possível realizar o registro');
-      }
     } on AuthException catch (e) {
       _handleError(e.message);
     } catch (e) {
@@ -109,20 +97,12 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      final response = await Supabase.instance.client.auth.signInWithPassword(
-        email: email,
-        password: password,
+      await _authController.signIn(email, password);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => HomePage(box: widget.box),
+        ),
       );
-
-      if (response.session != null) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => HomePage(box: widget.box),
-          ),
-        );
-      } else {
-        _handleError('Não foi possível realizar o login');
-      }
     } on AuthException catch (e) {
       _handleError(e.message);
     } catch (e) {

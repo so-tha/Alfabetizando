@@ -24,6 +24,7 @@ class Category {
       id: json['id'] as int,
       title: json['title'] as String,
       imageUrl: json['image_url'] as String,
+
     );
   }
 

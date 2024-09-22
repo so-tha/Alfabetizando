@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  audioplayers: ^6.1.0
   flutter:
    sdk: flutter
 
@@ -44,6 +45,7 @@ dependencies:
   sqflite: ^2.3.3+1
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -56,6 +58,7 @@ dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.1.0
   supabase_flutter: ^2.6.0
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

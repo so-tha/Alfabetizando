@@ -1,5 +1,7 @@
-import 'package:alfabetizando_tcc/data/cards.dart';
-import 'package:alfabetizando_tcc/screens/welcome_screen%20.dart';
+import 'package:alfabetizando_tcc/src/pages/welcome_screen%20.dart';
+
+import 'src/models/cards.dart';
+import 'src/pages/animal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

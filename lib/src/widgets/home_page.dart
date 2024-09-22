@@ -1,10 +1,11 @@
 import 'dart:ui';
+import '../pages/animal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../data/cards.dart';
+import '../models/cards.dart';
 import 'package:hive/hive.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,17 +35,16 @@ class _HomePageState extends State<HomePage> {
   void _loadData() async {
     var cachedCategories = widget.box.get('categories');
 
-    if(cachedCategories != null){
+    if (cachedCategories != null) {
       setState(() {
         _categoriesFuture = Future.value(cachedCategories);
       });
-    } else{
-      _categoriesFuture = fetchCategories().then((categories){
+    } else {
+      _categoriesFuture = fetchCategories().then((categories) {
         widget.box.put('categories', categories);
         return categories;
       });
     }
-
   }
 
   Future<void> _loadUserData() async {
@@ -61,7 +61,6 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         userName = userMetadata?['child_name'];
       });
-  
     }
 
     setState(() {
@@ -98,7 +97,7 @@ class _HomePageState extends State<HomePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); 
+            Navigator.pop(context);
           },
         ),
         actions: [
@@ -111,7 +110,7 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(60.0), 
+            borderRadius: BorderRadius.circular(60.0),
             child: Container(
               decoration: const BoxDecoration(
                 color: Color.fromRGBO(255, 246, 244, 1.0),
@@ -131,7 +130,8 @@ class _HomePageState extends State<HomePage> {
                                   radius: 20,
                                   backgroundImage: _image != null
                                       ? FileImage(_image!)
-                                      : const AssetImage('lib/assets/images/icon.jpg')
+                                      : const AssetImage(
+                                              'lib/assets/images/icon.jpg')
                                           as ImageProvider,
                                   child: _image == null
                                       ? const Icon(Icons.add_a_photo, size: 20)
@@ -162,9 +162,10 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Expanded(
                             child: FutureBuilder<List<Category>>(
-                              future: _categoriesFuture, 
+                              future: _categoriesFuture,
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
                                   return const Center(
                                       child: CircularProgressIndicator());
                                 } else if (snapshot.hasError) {
@@ -173,7 +174,8 @@ class _HomePageState extends State<HomePage> {
                                 } else if (!snapshot.hasData ||
                                     snapshot.data!.isEmpty) {
                                   return const Center(
-                                      child: Text('Nenhuma categoria encontrada.'));
+                                      child: Text(
+                                          'Nenhuma categoria encontrada.'));
                                 } else {
                                   final categories = snapshot.data!;
                                   return GridView.builder(
@@ -187,9 +189,14 @@ class _HomePageState extends State<HomePage> {
                                     itemCount: categories.length,
                                     itemBuilder: (context, index) {
                                       final category = categories[index];
-                                      return CategoryCard(
-                                        title: category.title,
-                                        imageUrl: category.imageUrl,
+                                      return InkWell(
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => AnimalPage(), 
+                                            ),
+                                          ),
+                                          child: CategoryCard(title: category.title, imageUrl: category.imageUrl),
                                       );
                                     },
                                   );
@@ -215,7 +222,7 @@ class _HomePageState extends State<HomePage> {
             ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
-            right: _isDrawerOpen ? 0 : -300, 
+            right: _isDrawerOpen ? 0 : -300,
             top: 0,
             bottom: 0,
             child: Material(
@@ -246,21 +253,15 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 16),
                     ListTile(
                       title: const Text('Áudio e voz'),
-                      onTap: () {
-                       
-                      },
+                      onTap: () {},
                     ),
                     ListTile(
                       title: const Text('Fontes'),
-                      onTap: () {
-                        
-                      },
+                      onTap: () {},
                     ),
                     ListTile(
                       title: const Text('Cartões'),
-                      onTap: () {
-                        
-                      },
+                      onTap: () {},
                     ),
                   ],
                 ),
@@ -309,7 +310,7 @@ class CategoryCard extends StatelessWidget {
           height: 100,
           width: double.infinity,
         ),
-        const SizedBox(height: 8), 
+        const SizedBox(height: 8),
         Text(
           title,
           style: const TextStyle(
