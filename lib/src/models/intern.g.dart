@@ -1,39 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'cards.dart';
+part of 'intern.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CategoryAdapter extends TypeAdapter<Category> {
+class CardsInternosAdapter extends TypeAdapter<CardsInternos> {
   @override
   final int typeId = 0;
 
   @override
-  Category read(BinaryReader reader) {
+  CardsInternos read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Category(
+    return CardsInternos(
       id: fields[0] as int,
-      title: fields[1] as String,
+      name: fields[1] as String,
       imageUrl: fields[2] as String,
-      
+      soundUrl: fields[3] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Category obj) {
+  void write(BinaryWriter writer, CardsInternos obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.title)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.imageUrl);
+      ..write(obj.imageUrl)
+      ..writeByte(3)
+      ..write(obj.soundUrl);
   }
 
   @override
@@ -42,7 +44,7 @@ class CategoryAdapter extends TypeAdapter<Category> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CategoryAdapter &&
+      other is CardsInternosAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

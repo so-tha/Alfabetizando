@@ -1,11 +1,12 @@
 import 'dart:ui';
-import '../pages/animal_page.dart';
+import '../pages/cards_internos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../models/cards.dart';
+import '../models/categories.dart';
+import '../models/intern.dart';
 import 'package:hive/hive.dart';
 
 class HomePage extends StatefulWidget {
@@ -139,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const SizedBox(width: 20),
-                              Text('Olá, ${userName ?? 'Otávio'}',
+                              Text('Bem-vindo(a), ${userName ?? ''}!',
                                   style: GoogleFonts.nunito(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -147,14 +148,7 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           Text(
-                            'Vamos Aprender?',
-                            style: GoogleFonts.nunito(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Escolha uma categoria',
+                            'Pronto(a) para mais uma aventura de aprendizado? Escolha uma categoria.',
                             style: GoogleFonts.nunito(
                               fontSize: 16,
                               fontWeight: FontWeight.w300,
@@ -173,9 +167,51 @@ class _HomePageState extends State<HomePage> {
                                       child: Text('Erro: ${snapshot.error}'));
                                 } else if (!snapshot.hasData ||
                                     snapshot.data!.isEmpty) {
-                                  return const Center(
-                                      child: Text(
-                                          'Nenhuma categoria encontrada.'));
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                              'Oops!',
+                                              style: GoogleFonts.nunito(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Image.asset(
+                                                    'lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png'), //colocar o caminho
+                                                SizedBox(height: 16),
+                                                Text(
+                                                  'Parece que nenhuma categoria foi encontrada, chame seu responsável!',
+                                                  style: GoogleFonts.nunito(
+                                                      fontSize: 18),
+                                                  textAlign: TextAlign.center,
+                                                )
+                                              ],
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text(
+                                                  'Entendi!',
+                                                  style: GoogleFonts.nunito(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              )
+                                            ],
+                                          );
+                                        });
+                                  });
+                                  return const SizedBox.shrink();
                                 } else {
                                   final categories = snapshot.data!;
                                   return GridView.builder(
@@ -191,12 +227,15 @@ class _HomePageState extends State<HomePage> {
                                       final category = categories[index];
                                       return InkWell(
                                         onTap: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => AnimalPage(), 
-                                            ),
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CategoryCard(title: '', imageUrl: '',),
                                           ),
-                                          child: CategoryCard(title: category.title, imageUrl: category.imageUrl),
+                                        ),
+                                        child: CategoryCard(
+                                            title: category.title,
+                                            imageUrl: category.imageUrl),
                                       );
                                     },
                                   );

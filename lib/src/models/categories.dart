@@ -1,11 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 
-import 'dart:convert';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive/hive.dart';
 
-part 'cards.g.dart';
+part 'categories.g.dart';
 
 @HiveType(typeId: 0)
 class Category {
