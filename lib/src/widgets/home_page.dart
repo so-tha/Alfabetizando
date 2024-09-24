@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:alfabetizando_tcc/src/ui/custom_category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,8 +32,6 @@ class _HomePageState extends State<HomePage> {
     _loadUserData();
     _categoriesFuture = fetchCategories();
   }
-
-
 
   void _loadData() async {
     var cachedCategories = widget.box.get('categories');
@@ -223,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                                       crossAxisCount: 2,
                                       crossAxisSpacing: 10,
                                       mainAxisSpacing: 10,
-                                      childAspectRatio: 2,
+                                      childAspectRatio: 1.5,
                                     ),
                                     itemCount: categories.length,
                                     itemBuilder: (context, index) {
@@ -254,10 +251,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          CustomDrawer(isDrawerOpen: _isDrawerOpen, toggleDrawer: _toggleDrawer),
+          CustomDrawer(
+              isDrawerOpen: _isDrawerOpen, toggleDrawer: _toggleDrawer),
         ],
       ),
     );
   }
 }
-
