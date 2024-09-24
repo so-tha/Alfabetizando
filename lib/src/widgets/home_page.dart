@@ -299,14 +299,16 @@ class CategoryCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
+
         Text(
-          title,
+          capitalizeWords(title),
           style: const TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,
+          
         ),
       ],
     );

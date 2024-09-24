@@ -45,7 +45,7 @@ class CustomDrawer extends StatelessWidget {
                 children: [
                   Container(
                     width: double.infinity,
-                    color: Colors.orange,
+                    color: const Color.fromRGBO(255, 203, 124, 1),
                     padding: const EdgeInsets.all(16.0),
                     child: const Text(
                       'Configurações',

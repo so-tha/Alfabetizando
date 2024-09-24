@@ -34,7 +34,14 @@ class Category {
     };
   }
 }
+String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
+String capitalizeWords(String s) => s
+    .split(' ')
+    .map((word) => capitalize(word))
+    .join(' ');
+
+    
 Future<List<Category>> fetchCategories() async {
   final response = await Supabase.instance.client.from('cards').select();
 
