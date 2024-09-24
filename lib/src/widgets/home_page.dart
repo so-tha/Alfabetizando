@@ -219,12 +219,13 @@ class _HomePageState extends State<HomePage> {
                                 } else {
                                   final categories = snapshot.data!;
                                   return GridView.builder(
+                                    padding: const EdgeInsets.all(10),
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
-                                      crossAxisSpacing: 8,
-                                      mainAxisSpacing: 8,
-                                      childAspectRatio: 0.8,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                      childAspectRatio: 2,
                                     ),
                                     itemCount: categories.length,
                                     itemBuilder: (context, index) {
@@ -233,7 +234,8 @@ class _HomePageState extends State<HomePage> {
                                         onTap: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => CategoryCard(
+                                            builder: (context) =>
+                                                const CategoryCard(
                                               title: '',
                                               imageUrl: '',
                                             ),
@@ -343,18 +345,17 @@ class CategoryCard extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(10),
               ),
               shadows: const [
                 BoxShadow(
-                  color: Colors.grey,
-                  blurRadius: 4,
-                  offset: Offset(2, 2),
+                  color: Color.fromARGB(255, 226, 226, 226),
+                  blurRadius: 2,
                   spreadRadius: 0,
                 ),
               ],
             ),
-            height: 120,
+            height: 140,
             width: double.infinity,
           ),
         ),
