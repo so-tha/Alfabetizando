@@ -75,10 +75,12 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       await _authController.signUp(email, password, name);
-      Navigator.of(context).pushReplacement(
+      Navigator.pushAndRemoveUntil(
+        context,
         MaterialPageRoute(
           builder: (context) => HomePage(box: widget.box),
         ),
+        (Route<dynamic> route) => false, 
       );
     } on AuthException catch (e) {
       _handleError(e.message);
@@ -98,10 +100,12 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       await _authController.signIn(email, password);
-      Navigator.of(context).pushReplacement(
+      Navigator.pushAndRemoveUntil(
+        context,
         MaterialPageRoute(
           builder: (context) => HomePage(box: widget.box),
         ),
+        (Route<dynamic> route) => false, 
       );
     } on AuthException catch (e) {
       _handleError(e.message);

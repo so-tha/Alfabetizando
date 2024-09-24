@@ -16,7 +16,7 @@ class CardsInternos {
 }
 
 class CardsInternosPage extends StatefulWidget {
-  final int categoryId; // Nome da categoria vindo do Supabase
+  final int categoryId; 
   final String categoryName;
   CardsInternosPage({super.key, required this.categoryId, required this.categoryName});
 
@@ -30,13 +30,13 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
   @override
   void initState() {
     super.initState();
-    // Usando a função fetchCategories que já existe para buscar os dados da categoria
+   
      _cardsInternosFuture = fetchCardsInternos(widget.categoryId).then((categories) {
       return categories.map((category) {
         return CardsInternos(
           name: category.name,
-          imageUrl: category.imageUrl, // Supondo que o category tenha a imagem
-          soundUrl: category.soundUrl, // Supondo que o category tenha o som
+          imageUrl: category.imageUrl, 
+          soundUrl: category.soundUrl,
         );
       }).toList();
     });
@@ -46,7 +46,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.categoryName), // Exibe o nome da categoria no AppBar
+        title: Text(widget.categoryName), 
       ),
       body: FutureBuilder<List<CardsInternos>>(
         future: _cardsInternosFuture,

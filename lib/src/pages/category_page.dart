@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 class CategoryCard extends StatelessWidget {
   final String title;
   final String imageUrl;
-  final VoidCallback onTap;  // Adicionando a função de callback
+  final VoidCallback onTap;  
 
   const CategoryCard({
     super.key,
     required this.title,
     required this.imageUrl,
-    required this.onTap,  // Função de callback necessária
+    required this.onTap,  
   });
 
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,  // Chama a função ao clicar no cartão
+      onTap: onTap,  
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
