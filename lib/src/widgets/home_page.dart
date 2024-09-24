@@ -1,14 +1,13 @@
 import 'dart:ui';
-import '../pages/cards_internos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/categories.dart';
-import '../models/intern.dart';
 import 'package:hive/hive.dart';
-import '../controllers/auth_controller.dart';
+
+import '../ui/custom_drawer.dart';
 
 class HomePage extends StatefulWidget {
   final Box box;
@@ -33,6 +32,8 @@ class _HomePageState extends State<HomePage> {
     _loadUserData();
     _categoriesFuture = fetchCategories();
   }
+
+
 
   void _loadData() async {
     var cachedCategories = widget.box.get('categories');
@@ -104,7 +105,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert),
+            icon: Icon(_isDrawerOpen ? Icons.close : Icons.menu),
             onPressed: _toggleDrawer,
           ),
         ],
@@ -144,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                               Text(
                                   userName != null
                                       ? 'Bem-vindo(a), $userName'
-                                      : 'Otávio',
+                                      : 'Bem-vindo(a)',
                                   style: GoogleFonts.nunito(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
@@ -152,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           Text(
-                            'Pronto(a) para mais uma aventura de aprendizado? Escolha uma categoria.',
+                            'Vamos aprender? Escolha uma categoria.',
                             style: GoogleFonts.nunito(
                               fontSize: 20,
                               fontWeight: FontWeight.w300,
@@ -256,65 +257,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          if (_isDrawerOpen)
-            GestureDetector(
-              onTap: _toggleDrawer,
-              child: Container(
-                color: Colors.black.withOpacity(0.3),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(),
-                ),
-              ),
-            ),
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            right: _isDrawerOpen ? 0 : -300,
-            top: 0,
-            bottom: 0,
-            child: Material(
-              elevation: 5,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(60.0),
-                bottomLeft: Radius.circular(60.0),
-              ),
-              child: Container(
-                width: 300,
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      color: Colors.orange,
-                      padding: const EdgeInsets.all(16.0),
-                      child: const Text(
-                        'Configurações',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ListTile(
-                      title: const Text('Áudio e voz'),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      title: const Text('Fontes'),
-                      onTap: () {},
-                    ),
-                    ListTile(
-                      title: const Text('Cartões'),
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          CustomDrawer(isDrawerOpen: _isDrawerOpen, toggleDrawer: _toggleDrawer),
         ],
       ),
     );
