@@ -104,6 +104,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: _toggleDrawer,
           ),
         ],
+        backgroundColor: const Color.fromRGBO(255, 203, 124, 1),
       ),
       body: Stack(
         children: [
