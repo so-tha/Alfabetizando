@@ -8,6 +8,7 @@ import 'dart:io';
 import '../models/categories.dart';
 import '../models/intern.dart';
 import 'package:hive/hive.dart';
+import '../controllers/auth_controller.dart';
 
 class HomePage extends StatefulWidget {
   final Box box;
@@ -140,9 +141,12 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const SizedBox(width: 20),
-                              Text('Bem-vindo(a), ${userName ?? ''}!',
+                              Text(
+                                  userName != null
+                                      ? 'Bem-vindo(a), $userName'
+                                      : 'Otávio',
                                   style: GoogleFonts.nunito(
-                                    fontSize: 14,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   )),
                             ],
@@ -150,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'Pronto(a) para mais uma aventura de aprendizado? Escolha uma categoria.',
                             style: GoogleFonts.nunito(
-                              fontSize: 16,
+                              fontSize: 20,
                               fontWeight: FontWeight.w300,
                             ),
                           ),
@@ -218,9 +222,9 @@ class _HomePageState extends State<HomePage> {
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
-                                      crossAxisSpacing: 16,
-                                      mainAxisSpacing: 16,
-                                      childAspectRatio: 1.0,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                      childAspectRatio: 0.8,
                                     ),
                                     itemCount: categories.length,
                                     itemBuilder: (context, index) {
@@ -229,8 +233,10 @@ class _HomePageState extends State<HomePage> {
                                         onTap: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                CategoryCard(title: '', imageUrl: '',),
+                                            builder: (context) => CategoryCard(
+                                              title: '',
+                                              imageUrl: '',
+                                            ),
                                           ),
                                         ),
                                         child: CategoryCard(
@@ -328,26 +334,29 @@ class CategoryCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          decoration: ShapeDecoration(
-            image: DecorationImage(
-              image: AssetImage(imageUrl),
-              fit: BoxFit.cover,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            shadows: const [
-              BoxShadow(
-                color: Color(0xFFE4E4E4),
-                blurRadius: 4,
-                offset: Offset(2, 2),
-                spreadRadius: 0,
+        Flexible(
+          flex: 1,
+          child: Container(
+            decoration: ShapeDecoration(
+              image: DecorationImage(
+                image: AssetImage(imageUrl),
+                fit: BoxFit.cover,
               ),
-            ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              shadows: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            height: 120,
+            width: double.infinity,
           ),
-          height: 100,
-          width: double.infinity,
         ),
         const SizedBox(height: 8),
         Text(
@@ -357,6 +366,7 @@ class CategoryCard extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
