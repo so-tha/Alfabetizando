@@ -54,7 +54,7 @@ Future<List<CardsInternos>> fetchCardsInternos(int categoryId) async {
       .eq('category_id', categoryId);
 
   if (response.isEmpty) {
-    throw Exception('Nenhum card encontrado.');
+    throw Exception('Nenhum card interno encontrado.');
   }
 
   final List<dynamic> data = response as List<dynamic>;
@@ -62,6 +62,7 @@ Future<List<CardsInternos>> fetchCardsInternos(int categoryId) async {
       .map((json) => CardsInternos.fromJson(json as Map<String, dynamic>))
       .toList();
 }
+
 
 Future<void> addCardsInternos(CardsInternos card) async {
   final response = await Supabase.instance.client

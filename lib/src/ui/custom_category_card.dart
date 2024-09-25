@@ -9,7 +9,7 @@ class CategoryCard extends StatelessWidget {
   const CategoryCard({
     super.key,
     required this.title,
-    required this.imageUrl,
+    required this.imageUrl, required int categoryId,
   });
 
   @override

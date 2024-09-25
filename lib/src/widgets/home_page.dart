@@ -1,4 +1,4 @@
-import 'package:alfabetizando_tcc/src/ui/custom_category_card.dart';
+import '../models/intern.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +7,7 @@ import 'dart:io';
 import '../models/categories.dart';
 import 'package:hive/hive.dart';
 
+import '../ui/custom_category_card.dart';
 import '../ui/custom_drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -231,15 +232,19 @@ class _HomePageState extends State<HomePage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const CategoryCard(
-                                              title: '',
-                                              imageUrl: '',
+                                                CategoryCard(
+                                                  title: category.title,
+                                                  imageUrl: category.imageUrl,
+                                              categoryId: category.id, 
                                             ),
                                           ),
                                         ),
                                         child: CategoryCard(
                                             title: category.title,
-                                            imageUrl: category.imageUrl),
+                                            imageUrl: category.imageUrl,
+                                            categoryId: category.id,
+                                            ),
+                                          
                                       );
                                     },
                                   );
