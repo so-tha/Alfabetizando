@@ -1,5 +1,6 @@
 import 'package:alfabetizando_tcc/src/ui/custom_intern_card.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/intern.dart';
 
 class CardsInternosPage extends StatefulWidget {
@@ -46,7 +47,47 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Erro: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhum cartão encontrado.'));
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(
+                        'Oops!',
+                        style: GoogleFonts.nunito(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                              'lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png'), //colocar o caminho
+                          SizedBox(height: 16),
+                          Text(
+                            'Parece que nenhuma categoria foi encontrada, chame seu responsável!',
+                            style: GoogleFonts.nunito(fontSize: 18),
+                            textAlign: TextAlign.center,
+                          )
+                        ],
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            'Entendi!',
+                            style: GoogleFonts.nunito(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    );
+                  });
+            });
+            return const SizedBox.shrink();
           } else {
             final cardsInternos = snapshot.data!;
             return GridView.builder(

@@ -82,6 +82,7 @@ flutter:
     - lib/assets/images/background_image.jpg
     - lib/assets/images/icon.jpg
     - lib/assets/images/user.png
+    - lib/assets/categorias/cars.png
     - lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png
 
 

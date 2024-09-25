@@ -156,6 +156,7 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: FutureBuilder<List<Category>>(
                               future: _categoriesFuture,
+                              
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
