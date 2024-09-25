@@ -6,7 +6,7 @@ import '../models/intern.dart';
 class CardsInternosPage extends StatefulWidget {
   final int categoryId;
   final String categoryName;
-  CardsInternosPage(
+  const CardsInternosPage(
       {super.key, required this.categoryId, required this.categoryName});
 
   @override
@@ -64,7 +64,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                         children: [
                           Image.asset(
                               'lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png'), //colocar o caminho
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           Text(
                             'Parece que nenhuma categoria foi encontrada, chame seu responsável!',
                             style: GoogleFonts.nunito(fontSize: 18),

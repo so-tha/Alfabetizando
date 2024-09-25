@@ -34,7 +34,10 @@ class Category {
     };
   }
 }
-String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+String capitalize(String s) {
+  if (s.isEmpty) return ''; 
+  return s[0].toUpperCase() + s.substring(1);
+}
 
 String capitalizeWords(String s) => s
     .split(' ')

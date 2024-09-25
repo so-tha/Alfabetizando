@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Image.asset(
-                                                    'lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png'), //colocar o caminho
+                                                    'lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png'),
                                                 SizedBox(height: 16),
                                                 Text(
                                                   'Parece que nenhuma categoria foi encontrada, chame seu responsável!',
