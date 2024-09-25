@@ -84,7 +84,31 @@ flutter:
     - lib/assets/images/user.png
     - lib/assets/categorias/cars.png
     - lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png
-
+    - lib/assets/categorias_internas/gato.png
+    - lib/assets/categorias_internas/cachorro.png
+    - lib/assets/categorias_internas/leao.png
+    - lib/assets/categorias_internas/maca.png
+    - lib/assets/categorias_internas/banana.png
+    - lib/assets/categorias_internas/uva.png
+    - lib/assets/categorias_internas/aviao.png
+    - lib/assets/categorias_internas/carro.png
+    - lib/assets/categorias_internas/onibus.png
+    - lib/assets/categorias_internas/tartaruga.png
+    - lib/assets/categorias_internas/cavalo.png
+    - lib/assets/categorias_internas/pao.png
+    - lib/assets/categorias_internas/chocolate.png
+    - lib/assets/categorias_internas/arroz.png
+    - lib/assets/categorias_internas/lapis.png
+    - lib/assets/categorias_internas/caderno.png
+    - lib/assets/categorias_internas/mochila.png
+    - lib/assets/categorias_internas/caneta.png
+    - lib/assets/categorias_internas/pai.png
+    - lib/assets/categorias_internas/avo.png
+    - lib/assets/categorias_internas/avo2.png
+    - lib/assets/categorias_internas/mae.png
+    - lib/assets/categorias_internas/blusa.png
+    - lib/assets/categorias_internas/saia.png
+    - lib/assets/categorias_internas/jaqueta.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
