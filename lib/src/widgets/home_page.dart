@@ -6,9 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/categories.dart';
 import 'package:hive/hive.dart';
-
-import '../ui/custom_category_card.dart';
 import '../ui/custom_drawer.dart';
+import '../ui/custom_category_card.dart';
+import 'math_poup.dart';
 
 class HomePage extends StatefulWidget {
   final Box box;
@@ -87,9 +87,31 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _toggleDrawer() {
-    setState(() {
-      _isDrawerOpen = !_isDrawerOpen;
-    });
+    if (_isDrawerOpen) {
+      setState(() {
+        _isDrawerOpen = false;
+      });
+    } else {
+      _openMathPopup(); 
+    }
+  }
+
+  void _openMathPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MathPopup(
+          onCorrectAnswer: (isCorrect) {
+            if (isCorrect) {
+              setState(() {
+                _isDrawerOpen = true;
+              });
+              Navigator.of(context).pop(); 
+            }
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -157,7 +179,6 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: FutureBuilder<List<Category>>(
                               future: _categoriesFuture,
-                              
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
@@ -231,15 +252,18 @@ class _HomePageState extends State<HomePage> {
                                         onTap: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                             builder: (context) => CardsInternosPage(box: widget.box, categoryId: category.id),
+                                            builder: (context) =>
+                                                CardsInternosPage(
+                                                    box: widget.box,
+                                                    categoryId: category.id),
                                           ),
                                         ),
                                         child: CategoryCard(
-                                            title: category.title,
-                                            imageUrl: category.imageUrl,
-                                            categoryId: category.id, categoryName: category.title,
-                                            ),
-                                          
+                                          title: category.title,
+                                          imageUrl: category.imageUrl,
+                                          categoryId: category.id,
+                                          categoryName: category.title,
+                                        ),
                                       );
                                     },
                                   );
