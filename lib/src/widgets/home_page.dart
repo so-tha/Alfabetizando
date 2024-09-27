@@ -1,3 +1,5 @@
+import 'package:alfabetizando_tcc/src/pages/cards_internos_page.dart';
+
 import '../models/intern.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -231,18 +233,13 @@ class _HomePageState extends State<HomePage> {
                                         onTap: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                CategoryCard(
-                                                  title: category.title,
-                                                  imageUrl: category.imageUrl,
-                                              categoryId: category.id, 
-                                            ),
+                                             builder: (context) => CardsInternosPage(box: widget.box, categoryId: category.id),
                                           ),
                                         ),
                                         child: CategoryCard(
                                             title: category.title,
                                             imageUrl: category.imageUrl,
-                                            categoryId: category.id,
+                                            categoryId: category.id, categoryName: category.title,
                                             ),
                                           
                                       );
