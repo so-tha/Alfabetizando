@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:alfabetizando_tcc/src/pages/audio_page.dart';
+import 'package:alfabetizando_tcc/src/pages/card_config.dart';
 import 'package:alfabetizando_tcc/src/pages/font_page.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +80,12 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   ListTile(
                     title: const Text('Cartões'),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CardconfigScreen()),
+                      );
+                    },
                   ),
                 ],
               ),
