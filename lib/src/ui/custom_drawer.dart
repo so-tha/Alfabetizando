@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:alfabetizando_tcc/src/pages/audio_page.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -59,7 +60,14 @@ class CustomDrawer extends StatelessWidget {
                   const SizedBox(height: 16),
                   ListTile(
                     title: const Text('Áudio e voz'),
-                    onTap: () {},
+                    onTap: () {
+                       Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AudioScreen(
+                              )),
+                    );
+                    },
                   ),
                   ListTile(
                     title: const Text('Fontes'),
