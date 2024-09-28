@@ -1,3 +1,5 @@
+import 'package:alfabetizando_tcc/src/widgets/font_define.dart';
+import 'package:alfabetizando_tcc/src/widgets/standard_size.dart';
 import 'package:flutter/material.dart';
 
 class FontScreen extends StatelessWidget {
@@ -28,11 +30,23 @@ class FontScreen extends StatelessWidget {
                       SizedBox(height: 16),
                       ListTile(
                         title: Text('Reedefinir nova fonte'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FontDefineScreen()),
+                          );
+                        },
                       ),
                       ListTile(
                         title: Text('Definir tamanho de fonte padrão'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (contAddRecordext) => StandardSize()),
+                          );
+                        },
                       ),
                       Spacer(),
                     ],
