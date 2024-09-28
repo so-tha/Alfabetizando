@@ -4,7 +4,7 @@ import 'dart:math';
 class MathPopup extends StatefulWidget {
   final Function(bool) onCorrectAnswer;
 
-  const MathPopup({required this.onCorrectAnswer});
+  const MathPopup({super.key, required this.onCorrectAnswer});
 
   @override
   _MathPopupState createState() => _MathPopupState();
@@ -36,7 +36,7 @@ class _MathPopupState extends State<MathPopup> {
       setState(() {
         _errorMessage = 'Resposta incorreta. Tente novamente!';
       });
-      _generateMathProblem(); // Gera outra conta se errar
+      _generateMathProblem(); 
     }
   }
 

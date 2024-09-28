@@ -1,7 +1,8 @@
-import 'package:alfabetizando_tcc/src/widgets/delete_record.dart';
 import 'package:flutter/material.dart';
 
-class AudioScreen extends StatelessWidget {
+class DeleteRecord extends StatelessWidget {
+  const DeleteRecord({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +28,7 @@ class AudioScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Definir voz padrão',
+                        'Apagar Gravação',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -35,13 +36,13 @@ class AudioScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Selecione a gravação que deseja utilizar',
+                        'Selecione a gravação que deseja deletar',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
                         ),
                       ),
-                      //isso aqui vai vir da tabela de users preferences
+                      //apagar diretamente no bd
                       SizedBox(height: 16),
                       ListTile(
                         title: Text('Voz da Mamãe'),
@@ -55,24 +56,7 @@ class AudioScreen extends StatelessWidget {
                         title: Text('Voz padrão feminina'),
                         onTap: () {},
                       ),
-                      ListTile(
-                        title: Text('Adicionar nova voz'),
-                        onTap: () {},
-                      ),
                       Spacer(),
-                      ListTile(
-                        title: Text(
-                          'Apagar gravação',
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => DeleteRecord()),
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),
