@@ -1,3 +1,4 @@
+import 'package:alfabetizando_tcc/src/widgets/add_record.dart';
 import 'package:alfabetizando_tcc/src/widgets/delete_record.dart';
 import 'package:flutter/material.dart';
 
@@ -57,7 +58,13 @@ class AudioScreen extends StatelessWidget {
                       ),
                       ListTile(
                         title: Text('Adicionar nova voz'),
-                        onTap: () {},
+                        onTap: () {
+                           Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddRecord()),
+                          );
+                        },
                       ),
                       Spacer(),
                       ListTile(
