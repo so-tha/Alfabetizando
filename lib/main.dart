@@ -51,6 +51,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'CustomFont', fontSize: 16),
+        ),
         useMaterial3: true,
       ),
       home: WelcomeScreen(box:box),

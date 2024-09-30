@@ -255,7 +255,9 @@ class _HomePageState extends State<HomePage> {
                                             builder: (context) =>
                                                 CardsInternosPage(
                                                     box: widget.box,
-                                                    categoryId: category.id),
+                                                    categoryId: category.id,
+                                                    categoryName: category.title,
+                                                    ),
                                           ),
                                         ),
                                         child: CategoryCard(
