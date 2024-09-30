@@ -1,3 +1,6 @@
+import 'package:alfabetizando_tcc/src/widgets/%20alter_card.dart';
+import 'package:alfabetizando_tcc/src/widgets/add_card.dart';
+import 'package:alfabetizando_tcc/src/widgets/delete_card.dart';
 import 'package:flutter/material.dart';
 
 class CardconfigScreen extends StatelessWidget {
@@ -28,15 +31,33 @@ class CardconfigScreen extends StatelessWidget {
                       SizedBox(height: 16),
                       ListTile(
                         title: Text('Adicionar novo cartão'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddCard()),
+                          );
+                        },
                       ),
                       ListTile(
                         title: Text('Alterar cartão'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AlterCard()),
+                          );
+                        },
                       ),
                       ListTile(
                         title: Text('Excluir cartão'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DeleteCard()),
+                          );
+                        },
                       ),
                       Spacer(),
                     ],

@@ -7,7 +7,6 @@ class FontDefineScreen extends StatefulWidget {
 }
 
 class _FontDefineScreenState extends State<FontDefineScreen> {
-  String? _selectedFontPath; 
 
   @override
   void initState() {
@@ -19,7 +18,6 @@ class _FontDefineScreenState extends State<FontDefineScreen> {
   Future<void> _loadFont() async {
     String? fontPath = await FontSelection.loadFont();
     setState(() {
-      _selectedFontPath = fontPath;
     });
   }
 
@@ -28,7 +26,6 @@ class _FontDefineScreenState extends State<FontDefineScreen> {
     String? fontPath = await FontSelection.pickFont();
     if (fontPath != null) {
       setState(() {
-        _selectedFontPath = fontPath;
       });
     }
   }
@@ -42,12 +39,10 @@ class _FontDefineScreenState extends State<FontDefineScreen> {
       ),
       body: ListView(
         children: [
-          
           ListTile(
             title: const Text('Fonte Padrão'),
             onTap: () {
               setState(() {
-                _selectedFontPath = null;
               });
             },
           ),
@@ -58,15 +53,6 @@ class _FontDefineScreenState extends State<FontDefineScreen> {
             },
           ),
           const SizedBox(height: 20),
-          Center(
-            child: Text(
-              'Texto de Exemplo',
-              style: TextStyle(
-                fontFamily: _selectedFontPath != null ? _selectedFontPath : null,
-                fontSize: 16.0,
-              ),
-            ),
-          ),
         ],
       ),
     );

@@ -5,7 +5,6 @@ import 'package:hive/hive.dart';
 
 part 'intern.g.dart';
 
-
 @HiveType(typeId: 0)
 class CardsInternos {
   @HiveField(0)
@@ -36,7 +35,6 @@ class CardsInternos {
     );
   }
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -46,6 +44,14 @@ class CardsInternos {
     };
   }
 }
+
+String capitalize(String s) {
+  if (s.isEmpty) return '';
+  return s[0].toUpperCase() + s.substring(1);
+}
+
+String capitalizeWords(String s) =>
+    s.split(' ').map((word) => capitalize(word)).join(' ');
 
 Future<List<CardsInternos>> fetchCardsInternos(int categoryId) async {
   final response = await Supabase.instance.client
@@ -62,7 +68,6 @@ Future<List<CardsInternos>> fetchCardsInternos(int categoryId) async {
       .map((json) => CardsInternos.fromJson(json as Map<String, dynamic>))
       .toList();
 }
-
 
 Future<void> addCardsInternos(CardsInternos card) async {
   final response = await Supabase.instance.client

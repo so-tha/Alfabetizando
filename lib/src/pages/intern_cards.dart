@@ -9,7 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 class CardsInternosPage extends StatefulWidget {
   final Box box;
   final int categoryId;
-  late final String categoryName;
+  String categoryName;
 
   CardsInternosPage({
     super.key,
