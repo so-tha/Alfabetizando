@@ -1,4 +1,4 @@
-import 'package:alfabetizando_tcc/src/widgets/%20alter_card.dart';
+import 'package:alfabetizando_tcc/src/widgets/alter_card.dart';
 import 'package:alfabetizando_tcc/src/widgets/add_card.dart';
 import 'package:alfabetizando_tcc/src/widgets/delete_card.dart';
 import 'package:flutter/material.dart';
