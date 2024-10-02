@@ -3,6 +3,8 @@ import 'package:alfabetizando_tcc/src/widgets/delete_record.dart';
 import 'package:flutter/material.dart';
 
 class AudioScreen extends StatelessWidget {
+  const AudioScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

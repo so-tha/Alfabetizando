@@ -35,7 +35,7 @@ class CardconfigScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AddCard()),
+                                builder: (context) => AddCardWithAudio()),
                           );
                         },
                       ),
