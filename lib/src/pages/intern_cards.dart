@@ -1,10 +1,10 @@
 import 'package:alfabetizando_tcc/src/models/intern.dart';
+import 'package:alfabetizando_tcc/src/pages/card_detail_page.dart';
 import 'package:alfabetizando_tcc/src/ui/custom_category_card.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
 
 class CardsInternosPage extends StatefulWidget {
   final Box box;
@@ -65,12 +65,13 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
           );
         } else {
           final categories = snapshot.data!;
-          
+
           if (categories.isNotEmpty) {
-           widget.categoryName;
+            widget.categoryName;
           } else {
             widget.categoryName = 'Sem Nome';
           }
+
           return Scaffold(
             appBar: AppBar(
               title: Text(
@@ -93,11 +94,24 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
-                return CategoryCard(
-                  title: category.name,
-                  imageUrl: category.imageUrl,
-                  categoryId: category.id,
-                  categoryName: category.name,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CardDetailPage(
+                          title: category.name,
+                          imageUrl: category.imageUrl,
+                        ),
+                      ),
+                    );
+                  },
+                  child: CategoryCard(
+                    title: category.name,
+                    imageUrl: category.imageUrl,
+                    categoryId: category.id,
+                    categoryName: category.name,
+                  ),
                 );
               },
             ),
