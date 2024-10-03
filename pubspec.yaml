@@ -113,36 +113,8 @@ flutter:
     - lib/assets/categorias_internas/blusa.png
     - lib/assets/categorias_internas/saia.png
     - lib/assets/categorias_internas/jaqueta.png
-    - lib/assets/audios/animais.mp3
-    - lib/assets/audios/arroz.mp3
-    - lib/assets/audios/automoveis.mp3
-    - lib/assets/audios/aviao.mp3
-    - lib/assets/audios/avo.mp3
-    - lib/assets/audios/avo2.mp3
-    - lib/assets/audios/banana.mp3
-    - lib/assets/audios/blusa.mp3
-    - lib/assets/audios/cachorro.mp3
-    - lib/assets/audios/caderno.mp3
-    - lib/assets/audios/calca.mp3
-    - lib/assets/audios/caneta.mp3
-    - lib/assets/audios/carro.mp3
-    - lib/assets/audios/cavalo.mp3
-    - lib/assets/audios/chocolate.mp3
-    - lib/assets/audios/comidas.mp3
-    - lib/assets/audios/escola.mp3
-    - lib/assets/audios/familia.mp3
-    - lib/assets/audios/gato.mp3
-    - lib/assets/audios/jaqueta.mp3
-    - lib/assets/audios/leao.mp3
-    - lib/assets/audios/maca.mp3
-    - lib/assets/audios/mae.mp3
-    - lib/assets/audios/mochila.mp3
-    - lib/assets/audios/onibus.mp3
-    - lib/assets/audios/pai.mp3
-    - lib/assets/audios/pao.mp3
-    - lib/assets/audios/tartaruga.mp3
-    - lib/assets/audios/uva.mp3
-    - lib/assets/audios/vestuario.mp3
+
+    - lib/assets/audios/
 
 
 
