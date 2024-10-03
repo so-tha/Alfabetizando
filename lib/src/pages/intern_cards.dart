@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:alfabetizando_tcc/src/models/intern.dart';
 import 'package:alfabetizando_tcc/src/pages/card_detail_page.dart';
 import 'package:alfabetizando_tcc/src/ui/custom_category_card.dart';
