@@ -17,17 +17,18 @@ class CardsInternosAdapter extends TypeAdapter<CardsInternos> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CardsInternos(
-      id: fields[0] as int,
+      id: fields[0] as int?,
       name: fields[1] as String,
       imageUrl: fields[2] as String,
       soundUrl: fields[3] as String,
+      categoryId: fields[4] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, CardsInternos obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class CardsInternosAdapter extends TypeAdapter<CardsInternos> {
       ..writeByte(2)
       ..write(obj.imageUrl)
       ..writeByte(3)
-      ..write(obj.soundUrl);
+      ..write(obj.soundUrl)
+      ..writeByte(4)
+      ..write(obj.categoryId);
   }
 
   @override

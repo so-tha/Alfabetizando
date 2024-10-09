@@ -111,7 +111,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                         CategoryCard(
                           title: category.name,
                           imageUrl: category.imageUrl,
-                          categoryId: category.id,
+                          categoryId: category.id!,
                           categoryName: category.name,
                         ),
                         Positioned(
