@@ -17,7 +17,7 @@ class CardsInternosAdapter extends TypeAdapter<CardsInternos> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CardsInternos(
-      id: fields[0] as int?,
+      id: fields[0] as int,
       name: fields[1] as String,
       imageUrl: fields[2] as String,
       soundUrl: fields[3] as String,

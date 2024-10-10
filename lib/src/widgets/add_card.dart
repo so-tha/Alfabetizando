@@ -102,13 +102,13 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
         String imageUrl = await _uploadFile(_selectedImage!, 'images');
         File audioFile = File(_audioPath!);
         String soundUrl = await _uploadFile(audioFile, 'audios');
-
+        int newId = _generateUniqueId();
         CardsInternos card = CardsInternos(
+          id: newId,
           name: _wordController.text,
           imageUrl: imageUrl,
           soundUrl: soundUrl,
           categoryId: int.parse(_categoryController.text),
-          id: null,
         );
 
         await addCardsInternos(card);
@@ -142,6 +142,10 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
         print('Por favor, preencha todos os campos e adicione áudio.');
       }
     }
+  }
+
+  int _generateUniqueId() {
+    return DateTime.now().millisecondsSinceEpoch;
   }
 
   @override

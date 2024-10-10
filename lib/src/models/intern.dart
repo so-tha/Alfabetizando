@@ -8,7 +8,7 @@ part 'intern.g.dart';
 @HiveType(typeId: 0)
 class CardsInternos {
   @HiveField(0)
-  final int? id;
+  final int id;
 
   @HiveField(1)
   final String name;
@@ -35,21 +35,18 @@ class CardsInternos {
       name: json['name'] as String,
       imageUrl: json['image_url'] as String,
       soundUrl: json['sound_url'] as String,
-      categoryId: json['category_id'] as int, //
+      categoryId: json['category_id'] as int, 
     );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {
+    return {
+      'id': id,
       'name': name,
       'image_url': imageUrl,
       'sound_url': soundUrl,
       'category_id': categoryId,
     };
-    if (id != null) {
-      data['id'] = id;
-    }
-    return data;
   }
 }
 
@@ -92,21 +89,18 @@ Future<void> addCardsInternos(CardsInternos card) async {
 }
 
 Future<void> updateCardsInternos(CardsInternos card) async {
-  if (card.id == null) {
-    throw Exception('ID do card não pode ser nulo para atualização.');
-  }
   final response = await Supabase.instance.client
       .from('cards_internos')
       .update(card.toJson())
-      .eq('id', card.id!);
+      .eq('id', card.id);
   if (response.error != null) {
     throw Exception('Erro ao atualizar card: ${response.error!.message}');
   }
   final box = await Hive.openBox<CardsInternos>('cards_internos');
-  final existingCard = box.get(card.id!);
+  final existingCard = box.get(card.id);
 
   if (existingCard != null) {
-    await box.put(card.id!, card);
+    await box.put(card.id, card);
   } else {
     throw Exception('Card não encontrado no Hive para atualização.');
   }
