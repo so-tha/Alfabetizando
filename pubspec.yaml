@@ -48,6 +48,7 @@ dependencies:
   postgres: ^3.3.0
   shared_preferences: ^2.3.2
   sqflite: ^2.3.3+1
+  supabase_flutter: ^2.8.0
 
 
 
@@ -61,7 +62,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   hive_generator: ^2.0.1
-  supabase_flutter: ^2.6.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

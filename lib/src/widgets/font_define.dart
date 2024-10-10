@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'font_selection.dart'; 
 
 class FontDefineScreen extends StatefulWidget {
@@ -7,7 +9,9 @@ class FontDefineScreen extends StatefulWidget {
 }
 
 class _FontDefineScreenState extends State<FontDefineScreen> {
-
+   final SupabaseClient supabase = Supabase.instance.client; 
+  String? userId;
+  String? selectedFontPath;
   @override
   void initState() {
     super.initState();
@@ -15,18 +19,45 @@ class _FontDefineScreenState extends State<FontDefineScreen> {
   }
 
   
-  Future<void> _loadFont() async {
-    String? fontPath = await FontSelection.loadFont();
-    setState(() {
-    });
+Future<void> _loadFont() async {
+  try {
+    final response = await supabase
+        .from('userpreferences')
+        .select('profile_font')
+        .eq('user_id', userId!)
+        .single();
+
+    if (response['profile_font'] != null) {
+      setState(() {
+        selectedFontPath = response['profile_font']['fontPath'];
+      });
+    }
+  } catch (error) {
+    if (kDebugMode) {
+      print('Error loading font: $error');
+    }
   }
+}
+
 
   
-  Future<void> _pickFont() async {
+Future<void> _pickFont() async {
     String? fontPath = await FontSelection.pickFont();
     if (fontPath != null) {
-      setState(() {
+      final response = await supabase.from('userpreferences').upsert({
+        'user_id': userId,
+        'profile_font': {'fontPath': fontPath}
       });
+
+      if (response.error == null) {
+        setState(() {
+          selectedFontPath = fontPath;
+        });
+      } else {
+        if (kDebugMode) {
+          print('Error saving font: ${response.error!.message}');
+        }
+      }
     }
   }
 
@@ -53,6 +84,8 @@ class _FontDefineScreenState extends State<FontDefineScreen> {
             },
           ),
           const SizedBox(height: 20),
+           if (selectedFontPath != null)
+            Text('Selected Font: $selectedFontPath'),
         ],
       ),
     );

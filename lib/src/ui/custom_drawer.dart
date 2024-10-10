@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:alfabetizando_tcc/src/pages/audio_page.dart';
 import 'package:alfabetizando_tcc/src/pages/card_config.dart';
 import 'package:alfabetizando_tcc/src/pages/font_page.dart';
 import 'package:flutter/material.dart';
@@ -60,15 +59,6 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ListTile(
-                    title: const Text('Áudio e voz'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AudioScreen()),
-                      );
-                    },
-                  ),
                   ListTile(
                     title: const Text('Fontes'),
                     onTap: () {
