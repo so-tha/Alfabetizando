@@ -1,16 +1,19 @@
-import 'dart:io';
-
-import 'package:alfabetizando_tcc/src/models/intern.dart';
-import 'package:alfabetizando_tcc/src/ui/custom_textField.dart';
+import 'package:alfabetizando_tcc/src/services/card_service.dart';
+import 'package:alfabetizando_tcc/src/ui/custom_fontDialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'audio_record.dart';
-import 'image_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../models/intern.dart';
+import 'package:provider/provider.dart';
+import '../providers/font_provider.dart';
 
 class AddCardWithAudio extends StatefulWidget {
-  const AddCardWithAudio({super.key});
+  final CardService cardService;
+
+  const AddCardWithAudio({super.key, required this.cardService});
 
   @override
   _AddCardWithAudioState createState() => _AddCardWithAudioState();
@@ -18,32 +21,55 @@ class AddCardWithAudio extends StatefulWidget {
 
 class _AddCardWithAudioState extends State<AddCardWithAudio> {
   File? _selectedImage;
-  String? _audioPath;
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _wordController = TextEditingController();
+  final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
+  bool isRecording = false;
+  String? _audioPath;
 
-  final SupabaseClient _supabase = Supabase.instance.client;
+  @override
+  void initState() {
+    super.initState();
+    _initializeRecorder();
+  }
 
-  Future<String> _uploadFile(File file, String folder) async {
-    try {
-      final fileName =
-          '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+  Future<void> _initializeRecorder() async {
+    await _recorder.openRecorder();
+    await Permission.microphone.request();
+  }
 
-      await _supabase.storage.from(folder).upload(fileName, file);
-
-      final publicUrl = _supabase.storage.from(folder).getPublicUrl(fileName);
-
-      if (publicUrl.isEmpty) {
-        throw Exception('Não foi possível gerar a URL pública para o arquivo.');
-      }
-
-      return publicUrl;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Erro no upload do arquivo: $e');
-      }
-      throw Exception('Falha no upload do arquivo: $e');
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
     }
+  }
+
+  Future<void> _startRecording() async {
+    setState(() {
+      isRecording = true;
+    });
+    final tempDir = Directory.systemTemp;
+    final filePath =
+        '${tempDir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.aac';
+    await _recorder.startRecorder(toFile: filePath);
+    _audioPath = filePath;
+  }
+
+  Future<void> _stopRecording() async {
+    final path = await _recorder.stopRecorder();
+    setState(() {
+      isRecording = false;
+      _audioPath = path;
+    });
+    print('Gravação salva em: $path');
+  }
+
+  int _generateUniqueId() {
+    return DateTime.now().millisecondsSinceEpoch;
   }
 
   Future<void> _saveCard() async {
@@ -57,10 +83,14 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
           barrierDismissible: false,
           builder: (_) => const Center(child: CircularProgressIndicator()),
         );
-        String imageUrl = await _uploadFile(_selectedImage!, 'images');
+
+        String imageUrl = await widget.cardService.uploadFile(_selectedImage!, 'images');
+
         File audioFile = File(_audioPath!);
-        String soundUrl = await _uploadFile(audioFile, 'audios');
+        String soundUrl = await widget.cardService.uploadFile(audioFile, 'audios');
+
         int newId = _generateUniqueId();
+
         CardsInternos card = CardsInternos(
           id: newId,
           name: _wordController.text,
@@ -68,13 +98,14 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
           soundUrl: soundUrl,
           categoryId: int.parse(_categoryController.text),
         );
+        await widget.cardService.addCardsInternos(card);
 
-        await addCardsInternos(card);
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Cartão salvo com sucesso!')),
         );
+
         _categoryController.clear();
         _wordController.clear();
         setState(() {
@@ -82,7 +113,7 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
           _audioPath = null;
         });
       } catch (e) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(); 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao salvar cartão: $e')),
         );
@@ -102,16 +133,38 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
     }
   }
 
-  int _generateUniqueId() {
-    return DateTime.now().millisecondsSinceEpoch;
+  void _openFontSizeDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const FontSizeDialog();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _recorder.closeRecorder();
+    _categoryController.dispose();
+    _wordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final fontProvider = Provider.of<FontProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Adicionar novo cartão'),
         backgroundColor: Colors.orange.shade200,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.font_download),
+            onPressed: _openFontSizeDialog,
+            tooltip: 'Ajustar Tamanho da Fonte',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -119,42 +172,115 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Adicionar novo cartão',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              const Text('Grave o áudio associado ao cartão'),
-              const SizedBox(height: 10),
-              AudioRecorder(onAudioRecorded: (path) {
-                setState(() {
-                  _audioPath = path;
-                });
-              }),
-              const SizedBox(height: 10),
-              if (_audioPath != null)
-                Text('Áudio salvo: ${_audioPath!.split('/').last}',
-                    style: const TextStyle(color: Colors.green)),
-              const SizedBox(height: 20),
-              const Text('Selecione a foto do cartão'),
-              const SizedBox(height: 10),
-              ImagePickerWidget(onImagePicked: (file) {
-                setState(() {
-                  _selectedImage = file;
-                });
-              }),
-              const SizedBox(height: 20),
-              const Text('Informe a categoria'),
-              const SizedBox(height: 10),
-              CustomTextField(
-                hintText: 'ID da categoria',
-                controller: _categoryController,
-                inputType: TextInputType.number,
+              Text(
+                'Adicionar novo cartão',
+                style: TextStyle(
+                  fontSize: fontProvider.fontSize.toDouble(),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
-              const Text('Informe a palavra'),
+              Text(
+                'Grave o áudio associado ao cartão',
+                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
+              ),
               const SizedBox(height: 10),
-              CustomTextField(
-                hintText: 'Palavra',
+              GestureDetector(
+                onLongPress: _startRecording,
+                onLongPressUp: _stopRecording,
+                child: Container(
+                  width: 90,
+                  height: 97,
+                  decoration: BoxDecoration(
+                    color:
+                        isRecording ? Colors.redAccent : Colors.orange.shade200,
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.mic,
+                      color: isRecording ? Colors.white : Colors.black,
+                      size: 48.0,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (_audioPath != null)
+                Text(
+                  'Áudio salvo: ${_audioPath!.split('/').last}',
+                  style: TextStyle(color: Colors.green, fontSize: fontProvider.fontSize.toDouble()),
+                ),
+              const SizedBox(height: 20),
+              Text(
+                'Selecione a foto do cartão',
+                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: _pickImage,
+                child: _selectedImage != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          _selectedImage!,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.add_a_photo,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Informe a categoria',
+                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _categoryController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.orange.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'ID da categoria',
+                ),
+                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Informe a palavra',
+                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
                 controller: _wordController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.orange.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'Palavra',
+                ),
+                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
               const SizedBox(height: 40),
               Center(
@@ -163,13 +289,16 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 40, vertical: 16),
                   ),
                   icon: const Icon(Icons.check, color: Colors.green),
-                  label: const Text('Salvar',
-                      style: TextStyle(color: Colors.white)),
+                  label: const Text(
+                    'Salvar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],

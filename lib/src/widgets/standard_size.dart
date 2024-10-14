@@ -1,6 +1,8 @@
-import 'package:alfabetizando_tcc/src/pages/font_page.dart';
+// lib/widgets/standard_size.dart
+
+import 'package:alfabetizando_tcc/src/ui/custom_fontDialog.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import '../ui/custom_fontDialog.dart';
 
 class StandardSize extends StatefulWidget {
   const StandardSize({super.key});
@@ -10,7 +12,7 @@ class StandardSize extends StatefulWidget {
 }
 
 class _StandardSizeState extends State<StandardSize> {
-  bool _dialogShown = false; 
+  bool _dialogShown = false;
 
   @override
   void initState() {
@@ -26,61 +28,11 @@ class _StandardSizeState extends State<StandardSize> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Ajustar tamanho padrão da fonte',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: '16 px',
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {},
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                        borderSide: const BorderSide(color: Colors.purple),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton.icon(
-                    icon: const Icon(Icons.check, color: Colors.green),
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.blue),
-                      foregroundColor: WidgetStateProperty.all(Colors.white),
-                    ),
-                    label: const Text('Salvar'),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const FontScreen()),
-                      ).then((_) {
-                        _dialogShown = false;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
+          return const FontSizeDialog();
         },
-      );
+      ).then((_) {
+        _dialogShown = false;
+      });
     }
   }
 
@@ -88,6 +40,12 @@ class _StandardSizeState extends State<StandardSize> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.orange.shade200,
+      body: Center(
+        child: Text(
+          'Bem-vindo ao Aplicativo!',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
     );
   }
 }

@@ -1,7 +1,9 @@
+import 'package:alfabetizando_tcc/src/services/card_service.dart';
 import 'package:alfabetizando_tcc/src/widgets/alter_card.dart';
 import 'package:alfabetizando_tcc/src/widgets/add_card.dart';
 import 'package:alfabetizando_tcc/src/widgets/delete_card.dart';
 import 'package:flutter/material.dart';
+
 
 class CardconfigScreen extends StatelessWidget {
   @override
@@ -35,7 +37,7 @@ class CardconfigScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AddCardWithAudio()),
+                                builder: (context) => AddCardWithAudio(cardService: CardService())),
                           );
                         },
                       ),
