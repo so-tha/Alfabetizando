@@ -2,20 +2,19 @@ import 'dart:io';
 import 'package:alfabetizando_tcc/src/models/user_preferences.dart';
 import 'package:alfabetizando_tcc/src/services/card_service.dart';
 import 'package:flutter/foundation.dart';
-import '../models/user.dart' as myUser;
+import '../models/user.dart' as AppUser;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class UserProvider extends ChangeNotifier {
-  myUser.User _user;
+  AppUser.User _user;
   UserPreferences _userPreferences;
   final SupabaseClient supabase = Supabase.instance.client;
   final CardService _cardService = CardService();
 
-  UserProvider(this._user, UserPreferences? userPreferences)
-      : _userPreferences = userPreferences ?? UserPreferences.defaultPreferences();
+  UserProvider(this._user, this._userPreferences);
 
-  myUser.User get user => _user;
+  AppUser.User get user => _user;
   UserPreferences get userPreferences => _userPreferences;
 
   Future<void> updateUser({
@@ -38,11 +37,15 @@ class UserProvider extends ChangeNotifier {
           ),
         );
 
-        if (authResponse.user == null) {
-          throw Exception('Failed to update user');
+        if (authResponse.user != null) {
+          _user = AppUser.User(
+            id: authResponse.user!.id,
+            email: authResponse.user!.email ?? '',
+            name: authResponse.user!.userMetadata?['name'] ?? '',
+            photoUrl: authResponse.user!.userMetadata?['avatar_url'] ?? '',
+          );
+          notifyListeners();
         }
-        _user = authResponse.user! as myUser.User;
-
       }
 
       if (password != null) {
@@ -92,12 +95,15 @@ class UserProvider extends ChangeNotifier {
         }
 
         final updatedUserResponse = await supabase.auth.getUser();
-        if (updatedUserResponse.user == null) {
-          throw Exception('Failed to get updated user data');
+        if (updatedUserResponse.user != null) {
+          _user = AppUser.User(
+            id: updatedUserResponse.user!.id,
+            email: updatedUserResponse.user!.email ?? '',
+            name: updatedUserResponse.user!.userMetadata?['name'] ?? '',
+            photoUrl: updatedUserResponse.user!.userMetadata?['avatar_url'] ?? '',
+          );
+          notifyListeners();
         }
-        _user = updatedUserResponse.user! as myUser.User;
-
-        notifyListeners();
       }
 
       notifyListeners();

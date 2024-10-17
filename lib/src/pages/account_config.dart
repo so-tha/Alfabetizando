@@ -22,13 +22,15 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-  late TextEditingController _fontSizeController;
   late UserPreferences _userPreferences;
   File? _profileImage;
   late UserProvider _userProvider;
   String? _selectedFontId;
+  double? _selectedFontSize;
 
-  bool _isLoading = false;
+  final List<double> _fontSizeOptions = [12, 14, 16, 18, 20];
+
+  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -36,7 +38,6 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-    _fontSizeController = TextEditingController();
   }
 
   @override
@@ -45,13 +46,10 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     _userPreferences = _userProvider.userPreferences;
     
-    _nameController.text = _userProvider.user.name ?? '';
-    _emailController.text = _userProvider.user.email ?? '';
-    _fontSizeController.text = _userPreferences.fontSize.toString();
+    _nameController.text = _userProvider.user?.name ?? '';
+    _emailController.text = _userProvider.user?.email ?? '';
+    _selectedFontSize = _userPreferences.fontSize;
     _selectedFontId = _userPreferences.defaultFontId;
-    if (_selectedFontId != 'helvetica' && _selectedFontId != 'arial') {
-      _selectedFontId = 'helvetica';
-    }
   }
 
   @override
@@ -59,7 +57,6 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _fontSizeController.dispose(); 
     super.dispose();
   }
 
@@ -75,7 +72,6 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
 
   void _saveChanges() {
     if (_formKey.currentState!.validate()) {
-      // Update user information
       _userProvider.updateUser(
         name: _nameController.text,
         email: _emailController.text,
@@ -84,7 +80,7 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
 
       _userProvider.updateUserPreferences(
         UserPreferences(
-          fontSize: double.parse(_fontSizeController.text),
+          fontSize: _selectedFontSize!,
           defaultFontId: _selectedFontId ?? 'helvetica',
         ),
       );
@@ -195,23 +191,31 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
                 },
               ),
               const SizedBox(height: 16),
-              CustomTextField(
-                controller: _fontSizeController,
-                labelText: 'Tamanho da Fonte',
-                inputType: TextInputType.number,
+              DropdownButtonFormField<double>(
+                value: _selectedFontSize,
+                decoration: InputDecoration(
+                  labelText: 'Tamanho da Fonte',
+                  filled: true,
+                  fillColor: Colors.orange.shade100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                items: _fontSizeOptions.map((size) {
+                  return DropdownMenuItem<double>(
+                    value: size,
+                    child: Text('$size'),
+                  );
+                }).toList(),
                 onChanged: (value) {
-                  final size = double.tryParse(value);
-                  if (size != null) {
-                    _userProvider.updateUserPreferences(UserPreferences(fontSize: size, defaultFontId: _userPreferences.defaultFontId));
-                  }
+                  setState(() {
+                    _selectedFontSize = value;
+                  });
                 },
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o tamanho da fonte.';
-                  }
-                  final size = double.tryParse(value);
-                  if (size == null || size < 8 || size > 72) {
-                    return 'O tamanho da fonte deve estar entre 8 e 72.';
+                  if (value == null) {
+                    return 'Por favor, selecione um tamanho de fonte.';
                   }
                   return null;
                 },

@@ -1,4 +1,3 @@
-
 import 'package:alfabetizando_tcc/src/models/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,7 +48,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
         email: _email,
         password: _password,
         userPreferences: UserPreferences(
-          theme: _theme ?? userProvider.userPreferences.theme,
           fontSize: _fontSize ?? userProvider.userPreferences.fontSize, defaultFontId: '',
         ),
         profileImage: _profileImage,
@@ -125,19 +123,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 obscureText: true,
                 onSaved: (value) => _password = value,
               ),
-              DropdownButtonFormField<String>(
-                value: _theme ?? userProvider.userPreferences.theme,
-                decoration: InputDecoration(labelText: 'Tema'),
-                items: ['Claro', 'Escuro'].map((theme) {
-                  return DropdownMenuItem(
-                    value: theme,
-                    child: Text(theme),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() {
-                  _theme = value;
-                }),
-              ),
               Slider(
                 value: _fontSize ?? userProvider.userPreferences.fontSize,
                 min: 12,
@@ -162,5 +147,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Cancel subscriptions, timers, etc.
+    super.dispose();
   }
 }

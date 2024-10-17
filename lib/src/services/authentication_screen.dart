@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
@@ -24,15 +26,23 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   String errorMessage = '';
   final AuthController _authController = AuthController();
+  StreamSubscription<AuthState>? _authStateSubscription;
+
 
   @override
   void initState() {
     super.initState();
     _isLogin = widget.isLogin;
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      setState(() {});
-    });
+    _authStateSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(_onAuthStateChange);
+ 
   }
+  void _onAuthStateChange(AuthState state) {
+    if (mounted) {
+      setState(() {
+      });
+    }
+  }
+
 
   InputDecoration _buildInputDecoration(String label) {
     return InputDecoration(

@@ -57,13 +57,13 @@ void main() async {
   }
   
   UserPreferences? _userPreferences = await box.get('userPreferences');
-  _userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'default');
+  _userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'helvetica');
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FontProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider(_user!, _userPreferences)),
+        ChangeNotifierProvider(create: (_) => UserProvider(_user!, _userPreferences!)),
       ],
       child: MyApp(box: box),
     ),
