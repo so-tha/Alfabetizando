@@ -1,77 +1,97 @@
-// lib/main.dart
-
+import 'package:alfabetizando_tcc/src/models/categories.dart';
 import 'package:alfabetizando_tcc/src/models/font.dart';
 import 'package:alfabetizando_tcc/src/models/intern.dart';
-import 'package:alfabetizando_tcc/src/models/categories.dart';
+import 'package:alfabetizando_tcc/src/models/user_preferences.dart';
 import 'package:alfabetizando_tcc/src/pages/welcome_screen%20.dart';
-// Remova o espaço no nome do arquivo
+import 'package:alfabetizando_tcc/src/providers/font_provider.dart';
+import 'package:alfabetizando_tcc/src/providers/user_provider.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:alfabetizando_tcc/src/providers/font_provider.dart'; // Make sure this import is correct
+import 'package:alfabetizando_tcc/src/models/user.dart' as AppUser;
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Carregar variáveis de ambiente
-  await dotenv.load(fileName: ".env"); 
+  await dotenv.load(fileName: ".env");
   final supabaseUrl = dotenv.get('URL');
   final supabaseAnonKey = dotenv.get('anonKey');
 
-  // Inicializar Supabase
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
     authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.pkce, 
-    )
+      authFlowType: AuthFlowType.pkce,
+    ),
   );
 
-  // Inicializar Hive
   final appDocumentDir = await getApplicationDocumentsDirectory();
-  await Hive.initFlutter(appDocumentDir.path); // Inicialize Hive apenas uma vez com o caminho correto
+  await Hive.initFlutter(appDocumentDir.path);
 
-  // Registrar adapters apenas se ainda não estiverem registrados
-  if (!Hive.isAdapterRegistered(0)) {
-    Hive.registerAdapter(CategoryAdapter()); // typeId: 0
-  }
-  if (!Hive.isAdapterRegistered(1)) {
-    Hive.registerAdapter(FontAdapter()); // typeId: 1
-  }
-  if (!Hive.isAdapterRegistered(2)) {
-    Hive.registerAdapter(CardsInternosAdapter()); // typeId: 2
-  } else {
-    print('Adapters já registrados');
-  }
+  _registerHiveAdapters();
 
-  // Abrir Hive box
   final box = await Hive.openBox('MyCacheBox');
 
-  // Sincronizar dados
-  await syncData(box);
+  await _syncData(box);
+  final userResponse = await Supabase.instance.client.auth.getUser();
+  AppUser.User? _user;
+  if (userResponse.user != null) {
+    _user = AppUser.User(
+      id: userResponse.user!.id,
+      email: userResponse.user!.email ?? '',
+      name: userResponse.user!.userMetadata?['name'] ?? '',
+      photoUrl: userResponse.user!.userMetadata?['avatar_url'] ?? '',
+    );
+  } else {
+    _user = AppUser.User(
+      id: '',
+      email: '',
+      name: '',
+      photoUrl: '',
+    );
+  }
+  
+  UserPreferences? _userPreferences = await box.get('userPreferences');
+  _userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'default');
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FontProvider()),
-        // Add other providers here if needed
+        ChangeNotifierProvider(create: (_) => UserProvider(_user!, _userPreferences)),
       ],
       child: MyApp(box: box),
     ),
   );
 }
 
-Future<void> syncData(Box box) async { 
+void _registerHiveAdapters() {
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(CategoryAdapter());
+  }
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(FontAdapter());
+  }
+  if (!Hive.isAdapterRegistered(2)) {
+    Hive.registerAdapter(CardsInternosAdapter());
+  } else {
+    if (kDebugMode) {
+      print('Adapters já registrados');
+    }
+  }
+}
+
+Future<void> _syncData(Box box) async {
   try {
-    final categories = await fetchCategories(); // Certifique-se de que esta função está definida e importada corretamente
-    await box.clear(); 
+    final categories = await fetchCategories();
+    await box.clear();
     for (var category in categories) {
-      await box.put(category.id, category); 
+      await box.put(category.id, category);
     }
   } catch (e) {
     if (kDebugMode) {
@@ -82,19 +102,27 @@ Future<void> syncData(Box box) async {
 
 class MyApp extends StatelessWidget {
   final Box box;
+
   const MyApp({required this.box, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(fontFamily: 'CustomFont', fontSize: 16),
-        ),
-        useMaterial3: true,
-      ),
-      home: WelcomeScreen(box: box),
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final fontFamily = userProvider.userPreferences.defaultFontId == 'helvetica'
+            ? GoogleFonts.roboto().fontFamily
+            : GoogleFonts.openSans().fontFamily;
+
+        return MaterialApp(
+          theme: ThemeData(
+            textTheme: Theme.of(context).textTheme.apply(
+              fontFamily: fontFamily,
+              fontSizeFactor: userProvider.userPreferences.fontSize / 16,
+            ),
+          ),
+          home: WelcomeScreen(box: box),
+        );
+      },
     );
   }
 }

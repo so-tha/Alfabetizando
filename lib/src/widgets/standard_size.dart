@@ -1,8 +1,5 @@
-// lib/widgets/standard_size.dart
-
 import 'package:alfabetizando_tcc/src/ui/custom_fontDialog.dart';
 import 'package:flutter/material.dart';
-import '../ui/custom_fontDialog.dart';
 
 class StandardSize extends StatefulWidget {
   const StandardSize({super.key});

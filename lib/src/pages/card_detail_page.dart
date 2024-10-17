@@ -70,6 +70,18 @@ class CardDetailPage extends StatelessWidget {
     if (word.toLowerCase() == "gato") {
       return "Ga-to";
     }
+    if (word.toLowerCase() == "cachorro") {
+      return "Ca-cho-rro";
+    }
+    if (word.toLowerCase() == "cavalo") {
+      return "Ca-va-lo";
+    }
+    if (word.toLowerCase() == "tartaruga") {
+      return "Tar-ta-ru-ga";
+    }
+    if (word.toLowerCase() == "banana") {
+      return "Ba-na-na";
+    }
     return word;
   }
 }

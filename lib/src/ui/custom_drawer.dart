@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:alfabetizando_tcc/src/pages/account_config.dart';
 import 'package:alfabetizando_tcc/src/pages/card_config.dart';
 import 'package:alfabetizando_tcc/src/pages/font_page.dart';
 import 'package:flutter/material.dart';
@@ -74,6 +75,15 @@ class CustomDrawer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => CardconfigScreen()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Conta'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AccountConfigPage()),
                       );
                     },
                   ),
