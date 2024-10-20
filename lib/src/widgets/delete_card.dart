@@ -7,17 +7,55 @@ class DeleteCard extends StatefulWidget {
 }
 
 class _DeleteCardState extends State<DeleteCard> {
-  final TextEditingController _categoriaController = TextEditingController();
-  final TextEditingController _cartaoController = TextEditingController();
+  String? _selectedCategory;
+  String? _selectedCard;
   bool _isLoading = false;
+  List<String> _categories = [];
+  List<String> _cards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    final response = await Supabase.instance.client
+        .from('cards')
+        .select('title')
+        .order('title');
+    
+    setState(() {
+      _categories = (response as List).map((item) => item['title'] as String).toList();
+    });
+  }
+
+  Future<void> _loadCards() async {
+    if (_selectedCategory == null) return;
+
+    final categoryResponse = await Supabase.instance.client
+        .from('cards')
+        .select('id')
+        .eq('title', _selectedCategory as Object)
+        .single();
+
+    final int categoryId = categoryResponse['id'];
+    final cardsResponse = await Supabase.instance.client
+        .from('cards_internos')
+        .select('name')
+        .eq('category_id', categoryId)
+        .order('name');
+
+    setState(() {
+      _cards = (cardsResponse as List).map((item) => item['name'] as String).toList();
+      _selectedCard = null;
+    });
+    }
 
   Future<void> _deletarCartao() async {
-    final String categoria = _categoriaController.text.trim();
-    final String cartao = _cartaoController.text.trim();
-
-    if (categoria.isEmpty || cartao.isEmpty) {
+    if (_selectedCategory == null || _selectedCard == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, preencha todos os campos.')),
+        SnackBar(content: Text('Por favor, selecione uma categoria e um cartão.')),
       );
       return;
     }
@@ -30,18 +68,8 @@ class _DeleteCardState extends State<DeleteCard> {
       final categoriaResponse = await Supabase.instance.client
           .from('cards')
           .select('id')
-          .eq('title', categoria)
+          .eq('title', _selectedCategory as Object)
           .single();
-
-      if (categoriaResponse == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Categoria não encontrada.')),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
 
       final int categoriaId = categoriaResponse['id'];
 
@@ -49,7 +77,7 @@ class _DeleteCardState extends State<DeleteCard> {
           .from('cards_internos')
           .delete()
           .eq('category_id', categoriaId)
-          .eq('name', cartao);
+          .eq('name', _selectedCard as Object);
 
       if (deleteResponse.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -59,8 +87,11 @@ class _DeleteCardState extends State<DeleteCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Cartão deletado com sucesso!')),
         );
-        _categoriaController.clear();
-        _cartaoController.clear();
+        setState(() {
+          _selectedCategory = null;
+          _selectedCard = null;
+        });
+        _loadCategories();
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,10 +131,23 @@ class _DeleteCardState extends State<DeleteCard> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('Informe a categoria'),
+              const Text('Selecione a categoria'),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _categoriaController,
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                items: _categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                    _selectedCard = null;
+                  });
+                  _loadCards();
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.orange.shade100,
@@ -114,10 +158,21 @@ class _DeleteCardState extends State<DeleteCard> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('Informe o cartão que deseja deletar'),
+              const Text('Selecione o cartão que deseja deletar'),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _cartaoController,
+              DropdownButtonFormField<String>(
+                value: _selectedCard,
+                items: _cards.map((String card) {
+                  return DropdownMenuItem<String>(
+                    value: card,
+                    child: Text(card),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCard = newValue;
+                  });
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.orange.shade100,
@@ -130,11 +185,7 @@ class _DeleteCardState extends State<DeleteCard> {
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton.icon(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          _deletarCartao();
-                        },
+                  onPressed: _isLoading ? null : _deletarCartao,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(

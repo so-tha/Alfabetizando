@@ -26,14 +26,12 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   String errorMessage = '';
   final AuthController _authController = AuthController();
-  StreamSubscription<AuthState>? _authStateSubscription;
 
 
   @override
   void initState() {
     super.initState();
     _isLogin = widget.isLogin;
-    _authStateSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(_onAuthStateChange);
  
   }
   void _onAuthStateChange(AuthState state) {

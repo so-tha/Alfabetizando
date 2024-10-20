@@ -16,7 +16,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
   String? _email;
   String? _password;
   File? _profileImage;
-  String? _theme;
   double? _fontSize;
 
   bool _isLoading = false;
@@ -50,7 +49,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
         userPreferences: UserPreferences(
           fontSize: _fontSize ?? userProvider.userPreferences.fontSize, defaultFontId: '',
         ),
-        profileImage: _profileImage,
+        profileImage: _profileImage, photoUrl: '',
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,7 +69,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    final user = userProvider.user;
     
     return Scaffold(
       appBar: AppBar(
@@ -88,7 +86,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   radius: 50,
                   backgroundImage: _profileImage != null
                       ? FileImage(_profileImage!)
-                      : NetworkImage(userProvider.user.photoUrl) as ImageProvider,
+                      : (userProvider.user.photoUrl != null
+                          ? NetworkImage(userProvider.user.photoUrl!)
+                          : null) as ImageProvider?,
                 ),
               ),
               SizedBox(height: 20),

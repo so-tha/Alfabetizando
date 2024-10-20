@@ -22,7 +22,7 @@ class UserProvider extends ChangeNotifier {
     String? email,
     String? password,
     UserPreferences? userPreferences,
-    File? profileImage,
+    File? profileImage, required String photoUrl,
   }) async {
     try {
       if (name != null || email != null) {
@@ -42,7 +42,7 @@ class UserProvider extends ChangeNotifier {
             id: authResponse.user!.id,
             email: authResponse.user!.email ?? '',
             name: authResponse.user!.userMetadata?['name'] ?? '',
-            photoUrl: authResponse.user!.userMetadata?['avatar_url'] ?? '',
+            photoUrl: authResponse.user!.userMetadata?['photo_url'] ?? '',
           );
           notifyListeners();
         }
@@ -62,8 +62,7 @@ class UserProvider extends ChangeNotifier {
         final prefResponse = await supabase
             .from('userpreferences') 
             .update(userPreferences.toJson())
-            .eq('user_id', _user.id);
-
+            .eq('user_id', _user.id!);
         if (prefResponse.error != null) {
           throw prefResponse.error!;
         }
@@ -88,7 +87,7 @@ class UserProvider extends ChangeNotifier {
         final dbResponse = await supabase
             .from('users') 
             .update({'photo_url': imageUrl})
-            .eq('id', _user.id);
+            .eq('id', _user.id!);
 
         if (dbResponse.error != null) {
           throw dbResponse.error!;
@@ -117,7 +116,7 @@ class UserProvider extends ChangeNotifier {
 
   void updateUserPreferences(UserPreferences newPreferences) {
     _userPreferences = newPreferences;
-    // You might need to save this to local storage or an API
+
     notifyListeners();
   }
 }

@@ -75,7 +75,7 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
       _userProvider.updateUser(
         name: _nameController.text,
         email: _emailController.text,
-        password: _passwordController.text.isNotEmpty ? _passwordController.text : null,
+        password: _passwordController.text.isNotEmpty ? _passwordController.text : null, photoUrl: '',
       );
 
       _userProvider.updateUserPreferences(

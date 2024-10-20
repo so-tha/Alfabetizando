@@ -10,7 +10,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import '../models/intern.dart';
 import '../providers/font_provider.dart';
-import '../services/card_service.dart'; // Certifique-se de ter esse serviço implementado
+import '../services/card_service.dart'; 
 
 class AlterCard extends StatefulWidget {
   @override
@@ -19,8 +19,8 @@ class AlterCard extends StatefulWidget {
 
 class _AlterCardState extends State<AlterCard> {
   final SupabaseClient supabase = Supabase.instance.client;
-  final TextEditingController _categoriaController = TextEditingController();
-  final TextEditingController _palavraAntigaController = TextEditingController();
+  String? _selectedCategory;
+  String? _selectedWord;
   final TextEditingController _palavraNovaController = TextEditingController();
 
   File? _selectedImage;
@@ -32,11 +32,50 @@ class _AlterCardState extends State<AlterCard> {
 
   late CardService cardService;
 
+  List<String> _categories = [];
+  List<String> _words = [];
+
   @override
   void initState() {
     super.initState();
-    cardService = CardService(); 
+    cardService = CardService();
     _initializeRecorder();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    final response = await supabase
+        .from('cards')
+        .select('title')
+        .order('title');
+    
+    setState(() {
+      _categories = (response as List).map((item) => item['title'] as String).toList();
+    });
+  }
+
+  Future<void> _loadWords() async {
+    if (_selectedCategory == null) return;
+
+    final categoryResponse = await supabase
+        .from('cards')
+        .select('id')
+        .eq('title', _selectedCategory as Object)
+        .single();
+
+    if (categoryResponse != null) {
+      final int categoryId = categoryResponse['id'];
+      final wordsResponse = await supabase
+          .from('cards_internos')
+          .select('name')
+          .eq('category_id', categoryId)
+          .order('name');
+
+      setState(() {
+        _words = (wordsResponse as List).map((item) => item['name'] as String).toList();
+        _selectedWord = null;
+      });
+    }
   }
 
   Future<void> _initializeRecorder() async {
@@ -89,11 +128,7 @@ class _AlterCardState extends State<AlterCard> {
   }
 
   Future<void> _alterarCard() async {
-    final String categoria = _categoriaController.text.trim();
-    final String palavraAntiga = _palavraAntigaController.text.trim();
-    final String palavraNova = _palavraNovaController.text.trim();
-
-    if (categoria.isEmpty || palavraAntiga.isEmpty || palavraNova.isEmpty) {
+    if (_selectedCategory == null || _selectedWord == null || _palavraNovaController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor, preencha todos os campos.')),
       );
@@ -108,7 +143,7 @@ class _AlterCardState extends State<AlterCard> {
       final categoriaResponse = await supabase
           .from('cards')
           .select('id')
-          .eq('title', categoria)
+          .eq('title', _selectedCategory as Object)
           .single();
 
       final int categoriaId = categoriaResponse['id'];
@@ -129,7 +164,7 @@ class _AlterCardState extends State<AlterCard> {
       }
 
       Map<String, dynamic> updateData = {
-        'name': palavraNova,
+        'name': _palavraNovaController.text.trim(),
         'updatedAt': DateTime.now().toUtc().toIso8601String(),
       };
 
@@ -145,7 +180,7 @@ class _AlterCardState extends State<AlterCard> {
           .from('cards_internos')
           .update(updateData)
           .eq('category_id', categoriaId)
-          .eq('name', palavraAntiga);
+          .eq('name', _selectedWord as Object);
 
       if (updateResponse.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -158,8 +193,6 @@ class _AlterCardState extends State<AlterCard> {
             SnackBar(content: Text('Card alterado com sucesso!')),
           );
 
-          _categoriaController.clear();
-          _palavraAntigaController.clear();
           _palavraNovaController.clear();
           setState(() {
             _selectedImage = null;
@@ -184,8 +217,6 @@ class _AlterCardState extends State<AlterCard> {
 
   @override
   void dispose() {
-    _categoriaController.dispose();
-    _palavraAntigaController.dispose();
     _palavraNovaController.dispose();
     _recorder.closeRecorder();
     super.dispose();
@@ -220,10 +251,23 @@ class _AlterCardState extends State<AlterCard> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('Informe a categoria'),
+              const Text('Selecione a categoria'),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _categoriaController,
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                items: _categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                    _selectedWord = null;
+                  });
+                  _loadWords();
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.orange.shade100,
@@ -231,15 +275,25 @@ class _AlterCardState extends State<AlterCard> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  hintText: 'Categoria',
                 ),
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
               const SizedBox(height: 20),
-              const Text('Informe a palavra que deseja alterar'),
+              const Text('Selecione a palavra que deseja alterar'),
               const SizedBox(height: 10),
-              TextFormField(
-                controller: _palavraAntigaController,
+              DropdownButtonFormField<String>(
+                value: _selectedWord,
+                items: _words.map((String word) {
+                  return DropdownMenuItem<String>(
+                    value: word,
+                    child: Text(word),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedWord = newValue;
+                  });
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.orange.shade100,
@@ -247,7 +301,6 @@ class _AlterCardState extends State<AlterCard> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  hintText: 'Palavra Atual',
                 ),
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
