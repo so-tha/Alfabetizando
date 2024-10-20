@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'font_selection.dart'; 
 
 class FontDefineScreen extends StatefulWidget {
+  const FontDefineScreen({super.key});
+
   @override
   _FontDefineScreenState createState() => _FontDefineScreenState();
 }

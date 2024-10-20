@@ -12,7 +12,7 @@ import 'package:file_picker/file_picker.dart';
 import '../services/font_manager.dart';
 
 class AccountConfigPage extends StatefulWidget {
-  const AccountConfigPage({Key? key}) : super(key: key);
+  const AccountConfigPage({super.key});
 
   @override
   _AccountConfigPageState createState() => _AccountConfigPageState();

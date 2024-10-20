@@ -12,6 +12,8 @@ import '../providers/font_provider.dart';
 import '../services/card_service.dart'; 
 
 class AlterCard extends StatefulWidget {
+  const AlterCard({super.key});
+
   @override
   _AlterCardState createState() => _AlterCardState();
 }

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 
 class CardconfigScreen extends StatelessWidget {
+  const CardconfigScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

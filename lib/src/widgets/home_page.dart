@@ -14,14 +14,14 @@ import '../ui/custom_drawer.dart';
 
 class HomePage extends StatefulWidget {
   final Box box;
-  const HomePage({Key? key, required this.box}) : super(key: key);
+  const HomePage({super.key, required this.box});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _isLoading = false;
+  final bool _isLoading = false;
   late Future<List<Category>> _categoriesFuture;
   bool _isDrawerOpen = false;
   final ImagePicker _picker = ImagePicker();

@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final Box box;
-  const WelcomeScreen({Key? key, required this.box}) : super(key: key);
+  const WelcomeScreen({super.key, required this.box});
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();

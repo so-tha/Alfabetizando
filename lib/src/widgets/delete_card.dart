@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DeleteCard extends StatefulWidget {
+  const DeleteCard({super.key});
+
   @override
   _DeleteCardState createState() => _DeleteCardState();
 }

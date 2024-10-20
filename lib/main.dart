@@ -39,16 +39,16 @@ void main() async {
 
   await _syncData(box);
   final userResponse = await Supabase.instance.client.auth.getUser();
-  AppUser.User? _user;
+  AppUser.User? user;
   if (userResponse.user != null) {
-    _user = AppUser.User(
+    user = AppUser.User(
       id: userResponse.user!.id,
       email: userResponse.user!.email ?? '',
       name: userResponse.user!.userMetadata?['name'] ?? '',
       photoUrl: userResponse.user!.userMetadata?['avatar_url'] ?? '',
     );
   } else {
-    _user = AppUser.User(
+    user = AppUser.User(
       id: '',
       email: '',
       name: '',
@@ -56,14 +56,14 @@ void main() async {
     );
   }
   
-  UserPreferences? _userPreferences = await box.get('userPreferences');
-  _userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'helvetica');
+  UserPreferences? userPreferences = await box.get('userPreferences');
+  userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'helvetica');
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FontProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider(_user!, _userPreferences!)),
+        ChangeNotifierProvider(create: (_) => UserProvider(user!, userPreferences!)),
       ],
       child: MyApp(box: box),
     ),

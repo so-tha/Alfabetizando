@@ -6,6 +6,8 @@ import '../providers/user_provider.dart';
 import 'dart:io';
 
 class UpdateProfile extends StatefulWidget {
+  const UpdateProfile({super.key});
+
   @override
   _UpdateProfileState createState() => _UpdateProfileState();
 }
