@@ -1,5 +1,4 @@
-// lib/ui/account_config_prt
-
+// ignore_for_file: unused_field
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,6 +8,8 @@ import '../models/user_preferences.dart';
 import '../ui/custom_textField.dart';
 import '../widgets/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:file_picker/file_picker.dart';
+import '../services/font_manager.dart';
 
 class AccountConfigPage extends StatefulWidget {
   const AccountConfigPage({Key? key}) : super(key: key);
@@ -27,8 +28,11 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
   late UserProvider _userProvider;
   String? _selectedFontId;
   double? _selectedFontSize;
+  String? _customFontPath;
+  String? _customFontName;
+  late FontManager _fontManager;
 
-  final List<double> _fontSizeOptions = [12, 14, 16, 18, 20];
+  final List<double> _fontSizeOptions = [12, 14, 16, 18, 20,22];
 
   final bool _isLoading = false;
 
@@ -38,6 +42,7 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _fontManager = FontManager();
   }
 
   @override
@@ -46,8 +51,8 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     _userPreferences = _userProvider.userPreferences;
     
-    _nameController.text = _userProvider.user?.name ?? '';
-    _emailController.text = _userProvider.user?.email ?? '';
+    _nameController.text = _userProvider.user.name ?? '';
+    _emailController.text = _userProvider.user.email ?? '';
     _selectedFontSize = _userPreferences.fontSize;
     _selectedFontId = _userPreferences.defaultFontId;
   }
@@ -70,12 +75,30 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     }
   }
 
+  Future<void> _pickCustomFont() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['ttf', 'otf'],
+    );
+
+    if (result != null) {
+      final file = result.files.single;
+      final fontId = await _fontManager.addCustomFont(file.path!, file.name);
+      setState(() {
+        _customFontPath = file.path;
+        _customFontName = file.name;
+        _selectedFontId = fontId;
+      });
+    }
+  }
+
   void _saveChanges() {
     if (_formKey.currentState!.validate()) {
       _userProvider.updateUser(
         name: _nameController.text,
         email: _emailController.text,
-        password: _passwordController.text.isNotEmpty ? _passwordController.text : null, photoUrl: '',
+        password: _passwordController.text.isNotEmpty ? _passwordController.text : null,
+        photoUrl: '',
       );
 
       _userProvider.updateUserPreferences(
@@ -155,40 +178,55 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
                 },
               ),
               const SizedBox(height: 24),
-              DropdownButtonFormField<String>(
-                value: _selectedFontId,
-                decoration: InputDecoration(
-                  labelText: 'Fonte Padrão',
-                  filled: true,
-                  fillColor: Colors.orange.shade100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedFontId,
+                      decoration: InputDecoration(
+                        labelText: 'Fonte Padrão',
+                        filled: true,
+                        fillColor: Colors.orange.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'helvetica',
+                          child: Text('Helvetica', style: GoogleFonts.roboto()),
+                        ),
+                        DropdownMenuItem(
+                          value: 'arial',
+                          child: Text('Arial', style: GoogleFonts.openSans()),
+                        ),
+                        ..._fontManager.customFonts.map((font) => DropdownMenuItem(
+                          value: font.id,
+                          child: Text(font.name),
+                        )),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedFontId = value;
+                          });
+                        }
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, selecione uma fonte padrão.';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                items: [
-                  DropdownMenuItem(
-                    value: 'helvetica',
-                    child: Text('Helvetica', style: GoogleFonts.roboto()),
-                  ),
-                  DropdownMenuItem(
-                    value: 'arial',
-                    child: Text('Arial', style: GoogleFonts.openSans()),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: _pickCustomFont,
+                    child: const Text('Importar Fonte'),
                   ),
                 ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedFontId = value;
-                    });
-                  }
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, selecione uma fonte padrão.';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<double>(

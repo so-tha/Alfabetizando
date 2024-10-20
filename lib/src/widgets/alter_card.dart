@@ -8,7 +8,6 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
-import '../models/intern.dart';
 import '../providers/font_provider.dart';
 import '../services/card_service.dart'; 
 
@@ -63,20 +62,18 @@ class _AlterCardState extends State<AlterCard> {
         .eq('title', _selectedCategory as Object)
         .single();
 
-    if (categoryResponse != null) {
-      final int categoryId = categoryResponse['id'];
-      final wordsResponse = await supabase
-          .from('cards_internos')
-          .select('name')
-          .eq('category_id', categoryId)
-          .order('name');
+    final int categoryId = categoryResponse['id'];
+    final wordsResponse = await supabase
+        .from('cards_internos')
+        .select('name')
+        .eq('category_id', categoryId)
+        .order('name');
 
-      setState(() {
-        _words = (wordsResponse as List).map((item) => item['name'] as String).toList();
-        _selectedWord = null;
-      });
+    setState(() {
+      _words = (wordsResponse as List).map((item) => item['name'] as String).toList();
+      _selectedWord = null;
+    });
     }
-  }
 
   Future<void> _initializeRecorder() async {
     await _recorder.openRecorder();

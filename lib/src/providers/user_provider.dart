@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:alfabetizando_tcc/src/models/user_preferences.dart';
-import 'package:alfabetizando_tcc/src/services/card_service.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user.dart' as AppUser;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,7 +9,6 @@ class UserProvider extends ChangeNotifier {
   AppUser.User _user;
   UserPreferences _userPreferences;
   final SupabaseClient supabase = Supabase.instance.client;
-  final CardService _cardService = CardService();
 
   UserProvider(this._user, this._userPreferences);
 
@@ -76,6 +74,7 @@ class UserProvider extends ChangeNotifier {
             .from('https://bqdmmkkmjblovfvefazq.supabase.co/storage/v1/s3')
             .upload(fileName, profileImage);
 
+        // ignore: unnecessary_null_comparison
         if (uploadResponse == null) {
           throw Exception('Failed to upload profile image');
         }
