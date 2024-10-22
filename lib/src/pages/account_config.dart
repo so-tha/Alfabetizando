@@ -50,8 +50,8 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     _userPreferences = _userProvider.userPreferences;
     
-    _nameController.text = _userProvider.user.name ?? '';
-    _emailController.text = _userProvider.user.email ?? '';
+    _nameController.text = _userProvider.user?.name ?? '';
+    _emailController.text = _userProvider.user?.email ?? '';
     _selectedFontSize = _userPreferences.fontSize;
     _selectedFontId = _userPreferences.defaultFontId;
   }
@@ -248,10 +248,19 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
                   return null;
                 },
               ),
+              
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _saveChanges,
                 child: const Text('Salvar Alterações'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _userProvider.deleteUser,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                child: const Text('Excluir Conta'),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:alfabetizando_tcc/src/pages/intern_cards.dart';
+import 'package:alfabetizando_tcc/src/providers/font_provider.dart';
 import 'package:alfabetizando_tcc/src/widgets/math_poup.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +13,7 @@ import '../ui/custom_drawer.dart';
 class HomePage extends StatefulWidget {
   final Box box;
   const HomePage({super.key, required this.box});
+  
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -55,7 +57,6 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).pop();
               _toggleDrawer();
             } else {
-              // Exibir mensagem de erro no popup
             }
           },
         );
@@ -71,19 +72,29 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final fontProvider = Provider.of<FontProvider>(context);
+
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         final user = userProvider.user;
-        final userName = user.name ?? '';
-        final userPhotoUrl = user.photoUrl;
-        final userFont = user.font ?? 'Nunito';
-
+        final userName = user?.name ?? '';
+        final userPhotoUrl = user?.photoUrl;
+        final userFont = user?.font ?? 'Nunito';
         return Theme(
           data: Theme.of(context).copyWith(
             textTheme: GoogleFonts.getTextTheme(userFont),
           ),
           child: Scaffold(
             appBar: AppBar(
+              title: Text(
+                userName.isNotEmpty
+                    ? 'Bem-vindo(a), $userName'
+                    : 'Bem-vindo(a)',
+                style: GoogleFonts.nunito(
+                  fontSize: fontProvider.fontSize.toDouble(),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               automaticallyImplyLeading: false,
               actions: [
                 IconButton(
@@ -108,25 +119,11 @@ class _HomePageState extends State<HomePage> {
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    const SizedBox(width: 20),
-                                    Text(
-                                      userName.isNotEmpty
-                                          ? 'Bem-vindo(a), $userName'
-                                          : 'Bem-vindo(a)',
-                                      style: GoogleFonts.nunito(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
                                 Text(
                                   'Vamos aprender? Escolha uma categoria.',
                                   style: GoogleFonts.nunito(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w300,
+                                    fontSize: fontProvider.fontSize.toDouble(),
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Expanded(
@@ -146,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                                                 title: Text(
                                                   'Oops!',
                                                   style: GoogleFonts.nunito(
-                                                    fontSize: 24,
+                                                    fontSize: fontProvider.fontSize.toDouble(),
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -157,7 +154,10 @@ class _HomePageState extends State<HomePage> {
                                                     const SizedBox(height: 16),
                                                     Text(
                                                       'Parece que nenhuma categoria foi encontrada, chame seu responsável!',
-                                                      style: GoogleFonts.nunito(fontSize: 18),
+                                                      style: GoogleFonts.nunito(
+                                                        fontSize: fontProvider.fontSize.toDouble(),
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
                                                       textAlign: TextAlign.center,
                                                     )
                                                   ],
@@ -170,7 +170,7 @@ class _HomePageState extends State<HomePage> {
                                                     child: Text(
                                                       'Entendi!',
                                                       style: GoogleFonts.nunito(
-                                                        fontSize: 16,
+                                                        fontSize: fontProvider.fontSize.toDouble(),
                                                         fontWeight: FontWeight.bold,
                                                       ),
                                                     ),
@@ -210,6 +210,7 @@ class _HomePageState extends State<HomePage> {
                                                 imageUrl: category.imageUrl,
                                                 categoryId: category.id,
                                                 categoryName: category.title,
+                                                soundUrl: category.soundUrl,
                                               ),
                                             );
                                           },

@@ -68,6 +68,46 @@ class _UpdateProfileState extends State<UpdateProfile> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar exclusão de conta'),
+          content: Text('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            TextButton(
+              child: Text('Excluir'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed == true) {
+      setState(() {
+        _isLoading = true;
+      });
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      try {
+        await userProvider.deleteUser();
+        Navigator.of(context).pushReplacementNamed('/login');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao excluir conta: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -88,14 +128,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   radius: 50,
                   backgroundImage: _profileImage != null
                       ? FileImage(_profileImage!)
-                      : (userProvider.user.photoUrl != null
-                          ? NetworkImage(userProvider.user.photoUrl!)
+                      : (userProvider.user?.photoUrl != null
+                          ? NetworkImage(userProvider.user!.photoUrl!)
                           : null) as ImageProvider?,
                 ),
               ),
               SizedBox(height: 20),
               TextFormField(
-                initialValue: userProvider.user.name,
+                initialValue: userProvider.user?.name,
                 decoration: InputDecoration(labelText: 'Nome'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -106,7 +146,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 onSaved: (value) => _name = value,
               ),
               TextFormField(
-                initialValue: userProvider.user.email,
+                initialValue: userProvider.user?.email ?? '',
                 decoration: InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
@@ -140,9 +180,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
               SizedBox(height: 20),
               _isLoading
                   ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _updateUser,
-                      child: Text('Atualizar Perfil'),
+                  : Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: _updateUser,
+                          child: Text('Atualizar Perfil'),
+                        ),
+                      ],
                     ),
             ],
           ),
@@ -153,7 +197,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   @override
   void dispose() {
-    // Cancel subscriptions, timers, etc.
     super.dispose();
   }
 }

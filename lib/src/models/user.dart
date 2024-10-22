@@ -40,4 +40,9 @@ class User {
       'font': font,
     };
   }
+
+  @override
+  String toString() {
+    return 'User(id: $id, name: $name, email: $email, photoUrl: $photoUrl, font: $font)';
+  }
 }

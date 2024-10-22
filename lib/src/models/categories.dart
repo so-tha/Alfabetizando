@@ -16,13 +16,17 @@ class Category {
   @HiveField(2)
   final String imageUrl;
 
-  Category({required this.id, required this.title, required this.imageUrl});
+  @HiveField(3)
+  final String? soundUrl;
+
+  Category({required this.id, required this.title, required this.imageUrl, this.soundUrl});
+
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'] as int,
       title: json['title'] as String,
       imageUrl: json['image_url'] as String,
-
+      soundUrl: json['sound_url'] as String?,
     );
   }
 
@@ -31,9 +35,11 @@ class Category {
       'id': id,
       'title': title,
       'image_url': imageUrl,
+      'sound_url': soundUrl,
     };
   }
 }
+
 String capitalize(String s) {
   if (s.isEmpty) return ''; 
   return s[0].toUpperCase() + s.substring(1);

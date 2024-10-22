@@ -10,11 +10,11 @@ class CardDetailPage extends StatefulWidget {
   final String soundUrl;
 
   const CardDetailPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.imageUrl,
     required this.soundUrl,
-  }) : super(key: key);
+  });
 
   @override
   _CardDetailPageState createState() => _CardDetailPageState();
@@ -69,8 +69,8 @@ class _CardDetailPageState extends State<CardDetailPage> {
                 children: [
                   Text(
                     capitalizeWords(widget.title),
-                    style: const TextStyle(
-                      fontSize: 28,
+                    style: TextStyle(
+                      fontSize: fontProvider.fontSize.toDouble(),
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -118,8 +118,9 @@ class _CardDetailPageState extends State<CardDetailPage> {
               const SizedBox(height: 10),
               Text(
                 _splitSyllables(widget.title), 
-                style: const TextStyle(
-                  fontSize: 22,
+                style: TextStyle(
+                  fontSize: fontProvider.fontSize.toDouble(),
+                  fontWeight: FontWeight.bold,
                   color: Colors.grey,
                 ),
               ),

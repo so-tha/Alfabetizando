@@ -38,24 +38,18 @@ void main() async {
   final box = await Hive.openBox('MyCacheBox');
 
   await _syncData(box);
-  final userResponse = await Supabase.instance.client.auth.getUser();
-  AppUser.User? user;
-  if (userResponse.user != null) {
-    user = AppUser.User(
-      id: userResponse.user!.id,
-      email: userResponse.user!.email ?? '',
-      name: userResponse.user!.userMetadata?['name'] ?? '',
-      photoUrl: userResponse.user!.userMetadata?['avatar_url'] ?? '',
-    );
-  } else {
-    user = AppUser.User(
-      id: '',
-      email: '',
-      name: '',
-      photoUrl: '',
-    );
-  }
-  
+
+  AppUser.User? user = await _getInitialUser(box); // Obter o usuário inicial
+
+  // Verificar se o usuário é nulo e inicializar com "Convidado"
+  user ??= AppUser.User(
+    id: '',
+    email: '',
+    name: 'Convidado',
+    photoUrl: '',
+  );
+
+  // Verificar se as preferências do usuário já estão armazenadas no Hive
   UserPreferences? userPreferences = await box.get('userPreferences');
   userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'helvetica');
 
@@ -63,11 +57,40 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FontProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider(user!, userPreferences!)),
+        ChangeNotifierProvider(create: (_) => UserProvider(user, userPreferences!)),
       ],
       child: MyApp(box: box),
     ),
   );
+}
+
+Future<AppUser.User?> _getInitialUser(Box box) async {
+  try {
+    final userResponse = await Supabase.instance.client.auth.getUser();
+
+    if (userResponse.user == null) {
+      // Deslogar e limpar cache se não houver usuário
+      await Supabase.instance.client.auth.signOut();
+      await box.clear();
+      return null;
+    }
+
+    // Se o usuário existir, retornar o objeto User
+    return AppUser.User(
+      id: userResponse.user!.id,
+      email: userResponse.user!.email ?? '',
+      name: userResponse.user!.userMetadata?['name'] ?? '',
+      photoUrl: userResponse.user!.userMetadata?['avatar_url'] ?? '',
+    );
+  } on AuthException catch (e) {
+    if (e.statusCode == '403' && e.message.contains('User from sub claim in JWT does not exist')) {
+      await Supabase.instance.client.auth.signOut();
+      await box.clear(); // Limpar o cache local
+    }
+    return null;
+  } catch (e) {
+    throw Exception('Erro ao obter o usuário inicial: $e');
+  }
 }
 
 void _registerHiveAdapters() {
@@ -79,17 +102,18 @@ void _registerHiveAdapters() {
   }
   if (!Hive.isAdapterRegistered(2)) {
     Hive.registerAdapter(CardsInternosAdapter());
-  } else {
-    if (kDebugMode) {
-      print('Adapters já registrados');
-    }
   }
 }
 
 Future<void> _syncData(Box box) async {
   try {
     final categories = await fetchCategories();
-    await box.clear();
+
+    if (categories.isEmpty) {
+      throw Exception('Nenhuma categoria encontrada.');
+    }
+
+    await box.clear(); // Limpar cache antigo
     for (var category in categories) {
       await box.put(category.id, category);
     }

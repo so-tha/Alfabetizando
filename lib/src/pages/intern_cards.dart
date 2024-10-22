@@ -1,12 +1,14 @@
 // ignore_for_file: must_be_immutable
 import 'package:alfabetizando_tcc/src/models/intern.dart';
 import 'package:alfabetizando_tcc/src/pages/card_detail_page.dart';
+import 'package:alfabetizando_tcc/src/providers/font_provider.dart';
 import 'package:alfabetizando_tcc/src/services/card_service.dart';
 import 'package:alfabetizando_tcc/src/ui/custom_category_card.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 
 class CardsInternosPage extends StatefulWidget {
@@ -38,6 +40,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
 
   @override
   Widget build(BuildContext context) {
+    final fontProvider = Provider.of<FontProvider>(context);
     return FutureBuilder<List<CardsInternos>>(
       future: _categoriesFuture,
       builder: (context, snapshot) {
@@ -81,7 +84,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                 widget.categoryName,
                 style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
-                  fontSize: 22,
+                  fontSize: fontProvider.fontSize.toDouble(),
                 ),
               ),
               backgroundColor: Colors.orange.shade200,

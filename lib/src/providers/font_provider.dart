@@ -1,7 +1,6 @@
 // lib/providers/font_provider.dart
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import '../services/preference_service.dart';
 import '../services/font_service.dart';
 import '../models/font.dart';

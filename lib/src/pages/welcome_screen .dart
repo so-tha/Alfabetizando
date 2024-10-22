@@ -63,13 +63,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   },
                   child: const Text('Registre-se'),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-
-                  },
-                  child: const Text("Faça Login com o Google"),
-                ),
               ],
             ),
           ),
