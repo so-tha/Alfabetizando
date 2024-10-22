@@ -57,3 +57,17 @@ String capitalize(String s) {
 
 String capitalizeWords(String s) =>
     s.split(' ').map((word) => capitalize(word)).join(' ');
+
+String splitSyllables(String word) {
+  word = word.toLowerCase();
+
+  List<String> syllables = [];
+  RegExp exp = RegExp(r'[aeiouáéíóúãõâêîôûàèìòù]+[^aeiouáéíóúãõâêîôûàèìòù]*');
+  Iterable<Match> matches = exp.allMatches(word);
+
+  for (var match in matches) {
+    syllables.add(match.group(0) ?? '');
+  }
+
+  return syllables.join('-');
+}

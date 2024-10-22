@@ -88,8 +88,8 @@ class _HomePageState extends State<HomePage> {
             appBar: AppBar(
               title: Text(
                 userName.isNotEmpty
-                    ? 'Bem-vindo(a), $userName'
-                    : 'Bem-vindo(a)',
+                    ? 'Seja Bem-vindo(a), $userName'
+                    : 'Seja Bem-vindo(a)',
                 style: GoogleFonts.nunito(
                   fontSize: fontProvider.fontSize.toDouble(),
                   fontWeight: FontWeight.bold,
@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                                   'Vamos aprender? Escolha uma categoria.',
                                   style: GoogleFonts.nunito(
                                     fontSize: fontProvider.fontSize.toDouble(),
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                                 Expanded(
@@ -153,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                                                     Image.asset('lib/assets/logs/logOpsAlgoDeuErrado-Photoroom.png'),
                                                     const SizedBox(height: 16),
                                                     Text(
-                                                      'Parece que nenhuma categoria foi encontrada, chame seu responsável!',
+                                                      'Parece que nenhuma categoria foi encontrada, chame seu responsável ou tente reiniciar a sua internet.',
                                                       style: GoogleFonts.nunito(
                                                         fontSize: fontProvider.fontSize.toDouble(),
                                                         fontWeight: FontWeight.bold,

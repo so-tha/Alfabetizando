@@ -32,7 +32,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
   @override
   Widget build(BuildContext context) {
     final fontProvider = Provider.of<FontProvider>(context);
-
+    String syllables = splitSyllables(widget.title);
     return Scaffold(
       appBar: AppBar(
         title: Text(capitalizeWords(widget.title)),
@@ -98,7 +98,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                    'Áudio não disponível para ${widget.title}.'),
+                                    'Essa não! Parece que não existe nenhum áudio disponível para ${widget.title}.'),
                               ),
                             );
                           }
@@ -107,7 +107,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                                'Áudio não disponível para ${widget.title}.'),
+                                'Essa não! Parece que não existe nenhum áudio disponível para ${widget.title}.'),
                           ),
                         );
                       }
@@ -117,7 +117,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
               ),
               const SizedBox(height: 10),
               Text(
-                _splitSyllables(widget.title), 
+                splitSyllables(widget.title), 
                 style: TextStyle(
                   fontSize: fontProvider.fontSize.toDouble(),
                   fontWeight: FontWeight.bold,
@@ -131,22 +131,36 @@ class _CardDetailPageState extends State<CardDetailPage> {
     );
   }
 
-  String _splitSyllables(String word) {
-    if (word.toLowerCase() == "gato") {
-      return "Ga-to";
+String splitSyllables(String word) {
+  word = word.toLowerCase();
+  List<String> syllables = [];
+
+  final digraphs = ['ch', 'lh', 'nh', 'qu', 'gu', 'rr'];
+  final vowels = 'aeiouáéíóúãõâêîôûàèìòù';
+  final nasalDitongos = ['ão', 'õe', 'ãe'];
+
+  String buffer = '';
+  for (int i = 0; i < word.length; i++) {
+    buffer += word[i];
+
+    if (i + 1 < word.length && digraphs.contains(word.substring(i, i + 2))) {
+      buffer += word[i + 1];
+      i++;
+    } 
+    else if (i + 1 < word.length && nasalDitongos.contains(word.substring(i, i + 2))) {
+      buffer += word[i + 1];
+      i++;
     }
-    if (word.toLowerCase() == "cachorro") {
-      return "Ca-cho-rro";
+    else if (vowels.contains(word[i])) {
+      syllables.add(buffer);
+      buffer = '';
     }
-    if (word.toLowerCase() == "cavalo") {
-      return "Ca-va-lo";
-    }
-    if (word.toLowerCase() == "tartaruga") {
-      return "Tar-ta-ru-ga";
-    }
-    if (word.toLowerCase() == "banana") {
-      return "Ba-na-na";
-    }
-    return word;
+  }
+
+  if (buffer.isNotEmpty) {
+    syllables.add(buffer);
+  }
+
+  return syllables.join('-');
   }
 }

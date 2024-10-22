@@ -39,17 +39,15 @@ void main() async {
 
   await _syncData(box);
 
-  AppUser.User? user = await _getInitialUser(box); // Obter o usuário inicial
+  AppUser.User? user = await _getInitialUser(box);
 
-  // Verificar se o usuário é nulo e inicializar com "Convidado"
   user ??= AppUser.User(
     id: '',
     email: '',
-    name: 'Convidado',
+    name: '',
     photoUrl: '',
   );
 
-  // Verificar se as preferências do usuário já estão armazenadas no Hive
   UserPreferences? userPreferences = await box.get('userPreferences');
   userPreferences ??= UserPreferences(fontSize: 16.0, defaultFontId: 'helvetica');
 
@@ -69,13 +67,11 @@ Future<AppUser.User?> _getInitialUser(Box box) async {
     final userResponse = await Supabase.instance.client.auth.getUser();
 
     if (userResponse.user == null) {
-      // Deslogar e limpar cache se não houver usuário
       await Supabase.instance.client.auth.signOut();
       await box.clear();
       return null;
     }
 
-    // Se o usuário existir, retornar o objeto User
     return AppUser.User(
       id: userResponse.user!.id,
       email: userResponse.user!.email ?? '',
@@ -85,7 +81,7 @@ Future<AppUser.User?> _getInitialUser(Box box) async {
   } on AuthException catch (e) {
     if (e.statusCode == '403' && e.message.contains('User from sub claim in JWT does not exist')) {
       await Supabase.instance.client.auth.signOut();
-      await box.clear(); // Limpar o cache local
+      await box.clear();
     }
     return null;
   } catch (e) {
@@ -109,18 +105,11 @@ Future<void> _syncData(Box box) async {
   try {
     final categories = await fetchCategories();
 
-    if (categories.isEmpty) {
-      throw Exception('Nenhuma categoria encontrada.');
-    }
-
-    await box.clear(); // Limpar cache antigo
-    for (var category in categories) {
-      await box.put(category.id, category);
-    }
-  } catch (e) {
-    if (kDebugMode) {
-      print('Erro ao sincronizar dados: $e');
-    }
+    if (categories.isEmpty) {throw Exception('Nenhuma categoria encontrada.');}
+    await box.clear();
+    for (var category in categories) {await box.put(category.id, category);}
+    } catch (e) {
+    if (kDebugMode) {throw Exception('Erro ao sincronizar dados: $e');}
   }
 }
 

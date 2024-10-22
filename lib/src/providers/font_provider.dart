@@ -12,6 +12,7 @@ class FontProvider with ChangeNotifier {
 
   List<Font> _fonts = [];
   String? _selectedFontId;
+  String _selectedFont = 'Default';
   int _fontSize = 16; // Valor padrão
 
   List<Font> get fonts => _fonts;
@@ -29,9 +30,28 @@ class FontProvider with ChangeNotifier {
   }
 
   Future<void> _fetchFonts() async {
-    _fonts = await _fontService.fetchFonts();
+    try {
+      _fonts = (await _fontService.fetchFonts()).cast<Font>();
+      if (_fonts.isNotEmpty && !_fonts.contains(_selectedFont)) {
+        _selectedFont = _fonts[0] as String;
+      }
+      notifyListeners();
+    } catch (e) {
+      _fonts = [Font(id: 'default', size: 16)];
+      throw Exception('Erro ao buscar fontes: $e');
+    }
+  }
+
+  void setSelectedFont(String font) {
+    _selectedFont = font;
     notifyListeners();
   }
+
+  void setFontSize(double size) {
+    _fontSize = size as int;
+    notifyListeners();
+  }
+
 
 Future<void> _loadFontPreference() async {
   final user = Supabase.instance.client.auth.currentUser;

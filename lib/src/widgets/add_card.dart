@@ -164,21 +164,21 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Grave o áudio associado ao cartão:', fontProvider),
+              _buildSectionTitle('Grave o áudio associado ao cartão. Por favor tente dizer a palavra de forma pausada e respeitando as sílabas.', fontProvider),
               const SizedBox(height: 10),
               _buildAudioRecordButton(),
               const SizedBox(height: 10),
               if (_audioPath != null) _buildAudioSavedMessage(fontProvider),
               const SizedBox(height: 20),
-              _buildSectionTitle('Selecione a foto do cartão:', fontProvider),
+              _buildSectionTitle('Selecione uma foto para o novo cartão:', fontProvider),
               const SizedBox(height: 10),
               _buildImagePicker(),
               const SizedBox(height: 20),
-              _buildSectionTitle('Selecione a categoria:', fontProvider),
+              _buildSectionTitle('Selecione a categoria da qual o cartão irá pertencer:', fontProvider),
               const SizedBox(height: 10),
               _buildCategoryDropdown(fontProvider),
               const SizedBox(height: 10),
-              _buildSectionTitle('Informe a palavra:', fontProvider),
+              _buildSectionTitle('Informe a nova palavra:', fontProvider),
               const SizedBox(height: 10),
               _buildWordInputField(fontProvider),
               const SizedBox(height: 40),
@@ -275,7 +275,7 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
           isExpanded: true,
         ),
         if (_categories.isEmpty)
-          const Text('Nenhuma categoria disponível', style: TextStyle(color: Colors.red)),
+          const Text('Que estranho! Parece que nenhuma categoria está disponível, tente fechar e abrir novamente o aplicativo', style: TextStyle(color: Colors.red)),
       ],
     );
   }

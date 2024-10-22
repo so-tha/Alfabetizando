@@ -329,7 +329,7 @@ class _AlterCardState extends State<AlterCard> {
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
               const SizedBox(height: 20),
-              const Text('Escolha uma nova imagem (opcional)'),
+              const Text('Escolha uma nova imagem'),
               const SizedBox(height: 10),
               GestureDetector(
                 onTap: _pickImage,
@@ -349,7 +349,7 @@ class _AlterCardState extends State<AlterCard> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('Grave um novo áudio (opcional)'),
+              const Text('Grave um novo áudio'),
               const SizedBox(height: 10),
               GestureDetector(
                 onTap: isRecording ? _stopRecording : _startRecording,

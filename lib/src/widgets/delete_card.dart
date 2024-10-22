@@ -62,6 +62,36 @@ class _DeleteCardState extends State<DeleteCard> {
       return;
     }
 
+    bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar exclusão'),
+          content: Text('Você tem certeza de que deseja excluir o cartão "$_selectedCard"?'),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Color.fromRGBO(51, 65, 222, 1),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Sim'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!confirmDelete) return;
+
     setState(() {
       _isLoading = true;
     });
@@ -189,7 +219,7 @@ class _DeleteCardState extends State<DeleteCard> {
                 child: ElevatedButton.icon(
                   onPressed: _isLoading ? null : _deletarCartao,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: const Color.fromRGBO(79, 79, 79, 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -204,12 +234,13 @@ class _DeleteCardState extends State<DeleteCard> {
                         )
                       : const Icon(
                           Icons.delete,
-                          color: Colors.white,
+                          color: Colors.red,
                         ),
                   label: const Text(
                     'Deletar',
                     style: TextStyle(
                       color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

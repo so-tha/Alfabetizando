@@ -1,18 +1,16 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/font.dart';
 
 class FontService {
-  final SupabaseClient supabase = Supabase.instance.client;
+  final SupabaseClient _supabaseClient = Supabase.instance.client;
 
-  Future<List<Font>> fetchFonts() async {
+  Future<List<String>> fetchFonts() async {
     try {
-      final response = await supabase
+      final response = await _supabaseClient
           .from('fonts')
-          .select()
-          .order('size', ascending: true);
+          .select('name');
 
       final List<dynamic> data = response as List<dynamic>;
-      return data.map((json) => Font.fromJson(json as Map<String, dynamic>)).toList();
+      return data.map((font) => font['name'] as String).toList();
     } catch (e) {
       throw Exception('Erro ao buscar fontes: $e');
     }

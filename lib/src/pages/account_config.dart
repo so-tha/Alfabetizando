@@ -254,14 +254,6 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
                 onPressed: _saveChanges,
                 child: const Text('Salvar Alterações'),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _userProvider.deleteUser,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                ),
-                child: const Text('Excluir Conta'),
-              ),
             ],
           ),
         ),
