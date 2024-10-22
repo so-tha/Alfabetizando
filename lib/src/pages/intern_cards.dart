@@ -105,6 +105,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                           builder: (context) => CardDetailPage(
                             title: category.name,
                             imageUrl: category.imageUrl,
+                            soundUrl: category.soundUrl,
                           ),
                         ),
                       );
@@ -118,25 +119,40 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                           categoryName: category.name,
                         ),
                         Positioned(
-                          top: 8,
+                          bottom: 8,
                           right: 8,
-                          child: IconButton(
-                            icon: Icon(Icons.volume_up),
-                            color: Colors.black,
-                            iconSize: 24.0,
-                            onPressed: () async {
-                              if (category.soundUrl.isNotEmpty) {
-                                try {
-                                  final soundUrl =
-                                      'https://bqdmmkkmjblovfvefazq.supabase.co/storage/v1/object/public/audios/${category.soundUrl}';
-                                  await _audioPlayer.setSourceUrl(soundUrl);
-                                  await _audioPlayer.resume();
-                                } catch (e) {
-                                  try {
-                                    await _audioPlayer.setSource(AssetSource(
-                                        'assets/audios/${category.soundUrl}'));
-                                    await _audioPlayer.resume();
-                                  } catch (e) {
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(width: 4),
+                              IconButton(
+                                icon: Icon(Icons.volume_up),
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                iconSize: 24.0,
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                onPressed: () async {
+                                  if (category.soundUrl.isNotEmpty) {
+                                    try {
+                                      final soundUrl =
+                                          'https://bqdmmkkmjblovfvefazq.supabase.co/storage/v1/object/public/audios/${category.soundUrl}';
+                                      await _audioPlayer.setSourceUrl(soundUrl);
+                                      await _audioPlayer.resume();
+                                    } catch (e) {
+                                      try {
+                                        await _audioPlayer.setSource(AssetSource(
+                                            'assets/audios/${category.soundUrl}'));
+                                        await _audioPlayer.resume();
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Áudio não disponível para ${category.name}.'),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
@@ -144,16 +160,9 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                                       ),
                                     );
                                   }
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        'Áudio não disponível para ${category.name}.'),
-                                  ),
-                                );
-                              }
-                            },
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ],

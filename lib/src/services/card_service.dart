@@ -97,4 +97,36 @@ class CardService {
       throw Exception('Erro ao remover card: $e');
     }
   }
+    Future<int> addNewCategory(String name) async {
+      try {
+        final response = await supabase
+            .from('cards') 
+            .insert({
+              'name': name, 
+            })
+            .select()
+            .single();
+
+        final int categoryId = response['id'];
+        final box = await Hive.openBox('categories');
+        await box.put(categoryId, name);
+
+        return categoryId;
+      } catch (e) {
+        throw Exception('Erro ao adicionar nova categoria: $e');
+      }
+  }
+    Future<List<String>> fetchCategories() async {
+      try {
+        final response = await supabase
+            .from('cards') 
+            .select();
+
+        final List<dynamic> data = response as List<dynamic>;
+
+        return data.map((json) => json['name'] as String).toList();
+      } catch (e) {
+        throw Exception('Erro ao buscar categorias: $e');
+      }
+    }
 }

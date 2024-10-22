@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:alfabetizando_tcc/src/pages/account_config.dart';
 import 'package:alfabetizando_tcc/src/pages/card_config.dart';
-import 'package:alfabetizando_tcc/src/pages/font_page.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -61,16 +60,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   ListTile(
-                    title: const Text('Fontes'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FontScreen()),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    title: const Text('Cartões'),
+                    title: const Text('Cartões e Audios'),
                     onTap: () {
                       Navigator.push(
                         context,

@@ -1,5 +1,3 @@
-// lib/widgets/alter_card.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -45,37 +43,49 @@ class _AlterCardState extends State<AlterCard> {
   }
 
   Future<void> _loadCategories() async {
-    final response = await supabase
-        .from('cards')
-        .select('title')
-        .order('title');
-    
-    setState(() {
-      _categories = (response as List).map((item) => item['title'] as String).toList();
-    });
+    try {
+      final response = await supabase
+          .from('cards')
+          .select('title')
+          .order('title');
+      
+      setState(() {
+        _categories = (response as List).map((item) => item['title'] as String).toList();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar categorias: $e')),
+      );
+    }
   }
 
   Future<void> _loadWords() async {
     if (_selectedCategory == null) return;
 
-    final categoryResponse = await supabase
-        .from('cards')
-        .select('id')
-        .eq('title', _selectedCategory as Object)
-        .single();
+    try {
+      final categoryResponse = await supabase
+          .from('cards')
+          .select('id')
+          .eq('title', _selectedCategory as Object)
+          .single();
 
-    final int categoryId = categoryResponse['id'];
-    final wordsResponse = await supabase
-        .from('cards_internos')
-        .select('name')
-        .eq('category_id', categoryId)
-        .order('name');
+      final int categoryId = categoryResponse['id'];
+      final wordsResponse = await supabase
+          .from('cards_internos')
+          .select('name')
+          .eq('category_id', categoryId)
+          .order('name');
 
-    setState(() {
-      _words = (wordsResponse as List).map((item) => item['name'] as String).toList();
-      _selectedWord = null;
-    });
+      setState(() {
+        _words = (wordsResponse as List).map((item) => item['name'] as String).toList();
+        _selectedWord = null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar palavras: $e')),
+      );
     }
+  }
 
   Future<void> _initializeRecorder() async {
     await _recorder.openRecorder();
@@ -98,7 +108,7 @@ class _AlterCardState extends State<AlterCard> {
       status = await Permission.microphone.request();
       if (!status.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Permissão de microfone negada')),
+          const SnackBar(content: Text('Permissão de microfone negada')),
         );
         return;
       }
@@ -129,7 +139,7 @@ class _AlterCardState extends State<AlterCard> {
   Future<void> _alterarCard() async {
     if (_selectedCategory == null || _selectedWord == null || _palavraNovaController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, preencha todos os campos.')),
+        const SnackBar(content: Text('Por favor, preencha todos os campos.')),
       );
       return;
     }
@@ -189,7 +199,7 @@ class _AlterCardState extends State<AlterCard> {
         final affectedRows = updateResponse.data;
         if (affectedRows != null && affectedRows.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Card alterado com sucesso!')),
+            const SnackBar(content: Text('Card alterado com sucesso!')),
           );
 
           _palavraNovaController.clear();
@@ -199,7 +209,7 @@ class _AlterCardState extends State<AlterCard> {
           });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Nenhum card foi encontrado para alterar.')),
+            const SnackBar(content: Text('Nenhum card foi encontrado para alterar.')),
           );
         }
       }
@@ -304,74 +314,9 @@ class _AlterCardState extends State<AlterCard> {
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
               const SizedBox(height: 20),
-              // Gravação de áudio
-              Text(
-                'Grave novo áudio associado ao cartão',
-                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
-              ),
+              const Text('Digite a nova palavra'),
               const SizedBox(height: 10),
-              GestureDetector(
-                onLongPress: _startRecording,
-                onLongPressUp: _stopRecording,
-                child: Container(
-                  width: 90,
-                  height: 97,
-                  decoration: BoxDecoration(
-                    color: isRecording ? Colors.redAccent : Colors.orange.shade200,
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.mic,
-                      color: isRecording ? Colors.white : Colors.black,
-                      size: 48.0,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              if (_audioPath != null)
-                Text(
-                  'Áudio salvo: ${_audioPath!.split('/').last}',
-                  style: TextStyle(color: Colors.green, fontSize: fontProvider.fontSize.toDouble()),
-                ),
-              const SizedBox(height: 20),
-              // Seleção de imagem
-              Text(
-                'Selecione a nova foto do cartão',
-                style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
-              ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: _pickImage,
-                child: _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          _selectedImage!,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.add_a_photo,
-                          size: 50,
-                          color: Colors.grey,
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 20),
-              const Text('Informe a nova palavra'),
-              const SizedBox(height: 10),
-              TextFormField(
+              TextField(
                 controller: _palavraNovaController,
                 decoration: InputDecoration(
                   filled: true,
@@ -380,40 +325,80 @@ class _AlterCardState extends State<AlterCard> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  hintText: 'Nova Palavra',
                 ),
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
               const SizedBox(height: 20),
-
-              // Botão Alterar
-              Center(
-                child: _isLoading
-                    ? CircularProgressIndicator()
-                    : ElevatedButton.icon(
-                        onPressed: _alterarCard,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 16,
-                          ),
-                        ),
-                        icon: const Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        ),
-                        label: const Text(
-                          'Alterar',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+              const Text('Escolha uma nova imagem (opcional)'),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: _selectedImage != null
+                      ? Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                        )
+                      : const Center(child: Text('Clique para selecionar uma imagem')),
+                ),
               ),
+              const SizedBox(height: 20),
+              const Text('Grave um novo áudio (opcional)'),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: isRecording ? _stopRecording : _startRecording,
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: isRecording ? Colors.red : Colors.green,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      isRecording ? 'Parar gravação' : 'Iniciar gravação',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const SizedBox(height: 40),
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _alterarCard,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 16,
+                    ),
+                  ),
+                  icon: _isLoading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                        ),
+                  label: Text(
+                    'Alterar Cartão',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: fontProvider.fontSize.toDouble(),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),

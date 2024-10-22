@@ -1,11 +1,8 @@
 import 'package:alfabetizando_tcc/src/pages/intern_cards.dart';
 import 'package:alfabetizando_tcc/src/widgets/math_poup.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import '../models/categories.dart';
 import 'package:hive/hive.dart';
 import '../ui/custom_category_card.dart';
@@ -24,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   final bool _isLoading = false;
   late Future<List<Category>> _categoriesFuture;
   bool _isDrawerOpen = false;
-  final ImagePicker _picker = ImagePicker();
+ 
 
   @override
   void initState() {
@@ -105,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                       color: Color.fromRGBO(255, 246, 244, 1.0),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(14.0),
                       child: _isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : Column(
@@ -113,18 +110,6 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Row(
                                   children: [
-                                    GestureDetector(
-                                      onTap: _pickImage,
-                                      child: CircleAvatar(
-                                        radius: 20,
-                                        backgroundImage: userPhotoUrl != null
-                                            ? CachedNetworkImageProvider(userPhotoUrl)
-                                            : const AssetImage('lib/assets/images/icon.jpg') as ImageProvider,
-                                        child: userPhotoUrl != null
-                                            ? const Icon(Icons.add_a_photo, size: 20)
-                                            : null,
-                                      ),
-                                    ),
                                     const SizedBox(width: 20),
                                     Text(
                                       userName.isNotEmpty
@@ -249,35 +234,5 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-  }
-
-  Future<void> _pickImage() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
-      if (pickedFile != null) {
-        final bytes = await pickedFile.readAsBytes();
-        final fileExt = pickedFile.path.split('.').last;
-        final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
-        final filePath = fileName;
-
-        await Supabase.instance.client.storage.from('avatars').uploadBinary(
-          filePath,
-          bytes,
-          fileOptions: FileOptions(contentType: pickedFile.mimeType),
-        );
-
-        final imageUrl = Supabase.instance.client.storage.from('avatars').getPublicUrl(filePath);
-
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.updateUser(photoUrl: imageUrl);
-
-        setState(() {});
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao selecionar a imagem.')),
-      );
-    }
   }
 }

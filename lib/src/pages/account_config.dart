@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../models/user_preferences.dart';
 import '../ui/custom_textField.dart';
-import '../widgets/image_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/font_manager.dart';
@@ -130,15 +129,6 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
           key: _formKey,
           child: Column(
             children: [
-              Center(
-                child: ImagePickerWidget(
-                  onImagePicked: (File image) {
-                    setState(() {
-                      _profileImage = image;
-                    });
-                  },
-                ),
-              ),
               const SizedBox(height: 20),
               CustomTextField(
                 controller: _nameController,

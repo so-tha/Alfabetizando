@@ -1,5 +1,6 @@
 // lib/providers/font_provider.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/preference_service.dart';
 import '../services/font_service.dart';
@@ -17,7 +18,6 @@ class FontProvider with ChangeNotifier {
   List<Font> get fonts => _fonts;
   int get fontSize => _fontSize;
   
-  // Adicione este getter público
   String? get selectedFontId => _selectedFontId;
 
   FontProvider() {
@@ -34,26 +34,28 @@ class FontProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _loadFontPreference() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user != null) {
-      try {
-        final savedFontId = await _preferenceService.loadFontPreference(user.id);
-        if (savedFontId != null) {
-          _selectedFontId = savedFontId;
-          final selectedFont = _fonts.firstWhere(
-            (font) => font.id == _selectedFontId,
-            orElse: () => _fonts.first,
+Future<void> _loadFontPreference() async {
+  final user = Supabase.instance.client.auth.currentUser;
+  if (user != null) {
+    try {
+      final savedFontId = await _preferenceService.loadFontPreference(user.id);
+      if (savedFontId != null && _fonts.isNotEmpty) {
+        _selectedFontId = savedFontId;
+        final selectedFont = _fonts.firstWhere(
+          (font) => font.id == _selectedFontId,
+          orElse: () => _fonts.first, 
           );
-          _fontSize = selectedFont.size;
-          notifyListeners();
-        }
-      } catch (e) {
-        // Trate o erro conforme necessário
-        print('Erro ao carregar preferência de fonte: $e');
+        _fontSize = selectedFont.size;
+        notifyListeners();
+      } else {
+        print('Nenhuma fonte salva ou lista de fontes está vazia.');
       }
+    } catch (e) {
+      throw Exception('Erro ao carregar preferência de fonte: $e');
     }
   }
+}
+
 
   Future<void> updateFont(String fontId) async {
     final user = Supabase.instance.client.auth.currentUser;
@@ -68,9 +70,9 @@ class FontProvider with ChangeNotifier {
         notifyListeners();
         await _preferenceService.saveFontPreference(user.id, fontId);
       } catch (e) {
-        // Revertendo em caso de erro
-        print('Erro ao salvar preferência de fonte: $e');
-        // Opcional: implementar lógica para reverter mudanças no estado
+        if (kDebugMode) {
+          throw Exception('Erro ao salvar preferência de fonte: $e');
+        }
       }
     }
   }

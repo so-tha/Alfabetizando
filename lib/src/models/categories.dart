@@ -88,6 +88,8 @@ Future<void> updateCategory(Category category) async {
   }
 }
 
+
+
 Future<void> deleteCategory(String id) async {
   final response =
       await Supabase.instance.client.from('cards').delete().eq('id', id);
