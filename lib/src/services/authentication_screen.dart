@@ -70,9 +70,10 @@ class _AuthScreenState extends State<AuthScreen> {
     return FilledButton.styleFrom(
       backgroundColor: const Color.fromRGBO(47, 61, 218, 1),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(15),
       ),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 20),
+      minimumSize: const Size(300, 60),
     );
   }
 
@@ -156,7 +157,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     key: _formKey,
                     child: SingleChildScrollView(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           if (!_isLogin)
                             TextFormField(
@@ -202,26 +203,6 @@ class _AuthScreenState extends State<AuthScreen> {
                             },
                           ),
                           const SizedBox(height: 24.0),
-                          FilledButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                if (_isLogin) {
-                                  _signIn(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
-                                } else {
-                                  _signUp(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                    _nameController.text,
-                                  );
-                                }
-                              }
-                            },
-                            style: _buildButtonStyle(),
-                            child: Text(_isLogin ? 'Login' : 'Registrar-se'),
-                          ),
                           TextButton(
                             onPressed: () {
                               setState(() {
@@ -241,6 +222,35 @@ class _AuthScreenState extends State<AuthScreen> {
                                 fontFamily: 'Nunito',
                                 height: 1.2,
                                 fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: FilledButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  if (_isLogin) {
+                                    _signIn(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                    );
+                                  } else {
+                                    _signUp(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                      _nameController.text,
+                                    );
+                                  }
+                                }
+                              },
+                              style: _buildButtonStyle(),
+                              child: Text(
+                                _isLogin ? 'Login' : 'Registrar-se',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),

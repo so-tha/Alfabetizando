@@ -37,10 +37,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(height: 20),
                 FilledButton(
                   style: ButtonStyle(
-                    backgroundColor: const WidgetStatePropertyAll<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                         Color.fromRGBO(255, 209, 139, 1)),
                     padding: WidgetStateProperty.all<EdgeInsets>(
-                        const EdgeInsets.all(20)),
+                        const EdgeInsets.symmetric(horizontal: 80, vertical: 20)),
+                    minimumSize: WidgetStateProperty.all<Size>(
+                        const Size(300, 60)),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -48,20 +55,48 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       MaterialPageRoute(builder: (context) => AuthScreen(box: widget.box)),
                     );
                   },
-                  child: const Text('Login'),
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 OutlinedButton(
+                  style: ButtonStyle(
+                    padding: WidgetStateProperty.all<EdgeInsets>(
+                        const EdgeInsets.symmetric(horizontal: 80, vertical: 20)),
+                    minimumSize: WidgetStateProperty.all<Size>(
+                        const Size(300, 60)),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    side: WidgetStateProperty.all<BorderSide>(
+                      const BorderSide(color: Color.fromRGBO(44, 162, 176, 1), width: 2),
+                    ),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => AuthScreen(
-                                isLogin: false, box: widget.box
+                                isLogin: false,
+                                box: widget.box
                               )),
                     );
                   },
-                  child: const Text('Registre-se'),
+                  child: const Text(
+                    'Registre-se',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(44, 162, 176, 1),
+                    ),
+                  ),
                 ),
               ],
             ),
