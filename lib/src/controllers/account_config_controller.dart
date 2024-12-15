@@ -36,7 +36,6 @@ class AccountConfigController {
       'style': const TextStyle(fontFamily: 'Arial'),
     },
     {'id': 'roboto', 'name': 'Roboto', 'style': GoogleFonts.roboto()},
-    {'id': 'openSans', 'name': 'Open Sans', 'style': GoogleFonts.openSans()},
     {'id': 'lato', 'name': 'Lato', 'style': GoogleFonts.lato()},
   ];
   
@@ -138,14 +137,13 @@ class AccountConfigController {
         userProvider.updateUserPreferences(
           UserPreferences(
             fontSize: selectedFontSize!,
-            defaultFontId: selectedFontId ?? 'roboto',
+            defaultFontId: selectedFontId ?? 'Roboto',
           ),
         );
         
         return true;
       } catch (e) {
-        Exception('Erro ao salvar alterações: $e');
-        return false;
+        throw Exception('Erro ao salvar alterações: $e');
       }
     }
     return false;

@@ -39,7 +39,7 @@ dependencies:
   html: ^0.15.0
   flutter_dotenv: ^5.1.0
   flutter_sound: ^9.16.2
-  google_fonts: ^6.2.1
+  google_fonts: ^6.1.0
   google_sign_in: ^6.2.1
   grouped_list: ^6.0.0
   hive_flutter: ^1.1.0
@@ -129,12 +129,20 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: lib/assets/fonts/Roboto-Regular.ttf
+    - family: Arial
+      fonts:
+        - asset: lib/assets/fonts/Arial.ttf 
+    - family: Helvetica
+      fonts:
+        - asset: lib/assets/fonts/Helvetica.ttf
+    - family: Lato
+      fonts:
+        - asset: lib/assets/fonts/Lato-Regular.ttf
+
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

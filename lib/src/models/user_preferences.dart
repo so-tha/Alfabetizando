@@ -8,7 +8,15 @@ class UserPreferences {
   }) : defaultFontId = _validateFontId(defaultFontId);
 
   static String _validateFontId(String fontId) {
-    if (fontId != 'helvetica' && fontId != 'arial') {
+    final validFonts = [
+      'helvetica',
+      'roboto',
+      'opensans',
+      'lato',
+      'arial',
+    ];
+
+    if (!validFonts.contains(fontId.toLowerCase())) {
       print('Warning: Invalid defaultFontId "$fontId". Defaulting to "helvetica".');
       return 'helvetica';
     }

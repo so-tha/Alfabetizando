@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserProvider extends ChangeNotifier {
   AppUser.User? _user;
-  UserPreferences _userPreferences = UserPreferences(fontSize: 16.0, defaultFontId: '');
+  UserPreferences _userPreferences = UserPreferences(fontSize: 16.0, defaultFontId: 'Roboto');
   final SupabaseClient supabase = Supabase.instance.client;
 
   UserProvider(this._user, this._userPreferences);
@@ -21,7 +21,7 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> clearUser() async {
     _user = null;
-    _userPreferences = UserPreferences(fontSize: 16.0, defaultFontId: '');
+    _userPreferences = UserPreferences(fontSize: 16.0, defaultFontId: 'Roboto');
     notifyListeners();
   }
 
@@ -133,9 +133,8 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  void updateUserPreferences(UserPreferences newPreferences) {
-    _userPreferences = newPreferences;
-
+  void updateUserPreferences(UserPreferences preferences) {
+    _userPreferences = preferences;
     notifyListeners();
   }
 }
