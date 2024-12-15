@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_sound/flutter_sound.dart';
@@ -43,50 +44,201 @@ class _AlterCardState extends State<AlterCard> {
   }
 
   Future<void> _loadCategories() async {
-    try {
-      final response = await supabase
-          .from('cards')
-          .select('title')
-          .order('title');
-      
-      setState(() {
-        _categories = (response as List).map((item) => item['title'] as String).toList();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar categorias: $e')),
-      );
-    }
+  final cardBox = Hive.box('cardBox');
+  final cachedCategories = cardBox.get('categories');
+  if (cachedCategories != null) {
+    setState(() {
+      _categories = List<String>.from(cachedCategories);
+    });
+    return;
   }
+  try {
+    final response = await supabase
+        .from('cards')
+        .select('title')
+        .order('title');
 
-  Future<void> _loadWords() async {
-    if (_selectedCategory == null) return;
+    List<String> categories = (response as List).map((item) => item['title'] as String).toList();
+    cardBox.put('categories', categories);
 
-    try {
-      final categoryResponse = await supabase
+    setState(() {
+      _categories = categories;
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao carregar categorias: $e')),
+    );
+  }
+}
+
+
+ Future<void> _loadWords() async {
+  if (_selectedCategory == null) return;
+  
+  final cardBox = Hive.box('cardBox');
+  final cachedWords = cardBox.get(_selectedCategory);
+  if (cachedWords != null) {
+    setState(() {
+      _words = List<String>.from(cachedWords);
+      _selectedWord = null;
+    });
+    return;
+  }
+  
+  try {
+    final categoryResponse = await supabase
+        .from('cards')
+        .select('id')
+        .eq('title', _selectedCategory as Object)
+        .single();
+
+    final int categoryId = categoryResponse['id'];
+    final wordsResponse = await supabase
+        .from('cards_internos')
+        .select('name')
+        .eq('category_id', categoryId)
+        .order('name');
+
+    List<String> words = (wordsResponse as List).map((item) => item['name'] as String).toList();
+    cardBox.put(_selectedCategory, words);
+    setState(() {
+      _words = words;
+      _selectedWord = null;
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao carregar palavras: $e')),
+    );
+  }
+}
+
+Future<void> _alterarCard() async {
+
+     if (_selectedCategory == null || _selectedWord == null || _palavraNovaController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, preencha todos os campos.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    bool confirmAlterCard = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmar exclusão'),
+          content: Text('Você tem certeza de que deseja alterar o cartão "$_selectedWord"?'),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Color.fromRGBO(51, 65, 222, 1),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Sim'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!confirmAlterCard) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+try {
+      final categoriaResponse = await supabase
           .from('cards')
           .select('id')
           .eq('title', _selectedCategory as Object)
           .single();
 
-      final int categoryId = categoryResponse['id'];
-      final wordsResponse = await supabase
-          .from('cards_internos')
-          .select('name')
-          .eq('category_id', categoryId)
-          .order('name');
+      final int categoriaId = categoriaResponse['id'];
+      if (kDebugMode) {
+        print('Categoria ID: $categoriaId');
+      }
 
-      setState(() {
-        _words = (wordsResponse as List).map((item) => item['name'] as String).toList();
-        _selectedWord = null;
+      String? imageUrl;
+      String? soundUrl;
+
+      if (_selectedImage != null) {
+        imageUrl = await cardService.uploadFile(_selectedImage!, 'images');
+      }
+
+      if (_audioPath != null) {
+        File audioFile = File(_audioPath!);
+        soundUrl = await cardService.uploadFile(audioFile, 'audios');
+      }
+
+      Map<String, dynamic> updateData = {
+        'name': _palavraNovaController.text.trim(),
+        'updatedAt': DateTime.now().toUtc().toIso8601String(),
+      };
+
+      if (imageUrl != null) {
+        updateData['image_url'] = imageUrl;
+      }
+
+      if (soundUrl != null) {
+        updateData['sound_url'] = soundUrl;
+      }
+
+      final updateResponse = await supabase
+          .from('cards_internos')
+          .update(updateData)
+          .eq('category_id', categoriaId)
+          .eq('name', _selectedWord as Object);
+
+      if (updateResponse.error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(updateResponse.error!.message)),
+        );
+      } else if (updateResponse.data != null && updateResponse.data.isNotEmpty) {
+      final cardBox = Hive.box('cardBox');
+      
+      cardBox.put(_selectedWord, {
+        'name': _palavraNovaController.text.trim(),
+        'image_url': imageUrl,
+        'sound_url': soundUrl,
+        'updatedAt': DateTime.now().toUtc().toIso8601String(),
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Card alterado com sucesso!')),
+      );
+          _palavraNovaController.clear();
+          setState(() {
+            _selectedImage = null;
+            _audioPath = null;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Nenhum card foi encontrado para alterar.')),
+          );
+        }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar palavras: $e')),
+        SnackBar(content: Text('Ocorreu um erro: $e')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
-
+ 
   Future<void> _initializeRecorder() async {
     await _recorder.openRecorder();
     await Permission.microphone.request();
@@ -136,93 +288,6 @@ class _AlterCardState extends State<AlterCard> {
     }
   }
 
-  Future<void> _alterarCard() async {
-    if (_selectedCategory == null || _selectedWord == null || _palavraNovaController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha todos os campos.')),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final categoriaResponse = await supabase
-          .from('cards')
-          .select('id')
-          .eq('title', _selectedCategory as Object)
-          .single();
-
-      final int categoriaId = categoriaResponse['id'];
-      if (kDebugMode) {
-        print('Categoria ID: $categoriaId');
-      }
-
-      String? imageUrl;
-      String? soundUrl;
-
-      if (_selectedImage != null) {
-        imageUrl = await cardService.uploadFile(_selectedImage!, 'images');
-      }
-
-      if (_audioPath != null) {
-        File audioFile = File(_audioPath!);
-        soundUrl = await cardService.uploadFile(audioFile, 'audios');
-      }
-
-      Map<String, dynamic> updateData = {
-        'name': _palavraNovaController.text.trim(),
-        'updatedAt': DateTime.now().toUtc().toIso8601String(),
-      };
-
-      if (imageUrl != null) {
-        updateData['image_url'] = imageUrl;
-      }
-
-      if (soundUrl != null) {
-        updateData['sound_url'] = soundUrl;
-      }
-
-      final updateResponse = await supabase
-          .from('cards_internos')
-          .update(updateData)
-          .eq('category_id', categoriaId)
-          .eq('name', _selectedWord as Object);
-
-      if (updateResponse.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(updateResponse.error!.message)),
-        );
-      } else {
-        final affectedRows = updateResponse.data;
-        if (affectedRows != null && affectedRows.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Card alterado com sucesso!')),
-          );
-
-          _palavraNovaController.clear();
-          setState(() {
-            _selectedImage = null;
-            _audioPath = null;
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nenhum card foi encontrado para alterar.')),
-          );
-        }
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ocorreu um erro: $e')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -267,7 +332,7 @@ class _AlterCardState extends State<AlterCard> {
                 items: _categories.map((String category) {
                   return DropdownMenuItem<String>(
                     value: category,
-                    child: Text(category),
+                    child: Text(category, style: TextStyle(fontSize: 18)), // Increased font size
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
@@ -284,6 +349,7 @@ class _AlterCardState extends State<AlterCard> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20), // Increased padding
                 ),
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
@@ -377,10 +443,7 @@ class _AlterCardState extends State<AlterCard> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 16,
-                    ),
+                    fixedSize: const Size(135, 45),
                   ),
                   icon: _isLoading
                       ? const CircularProgressIndicator(

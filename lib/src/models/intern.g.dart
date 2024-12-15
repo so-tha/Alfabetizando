@@ -22,13 +22,14 @@ class CardsInternosAdapter extends TypeAdapter<CardsInternos> {
       imageUrl: fields[2] as String,
       soundUrl: fields[3] as String,
       categoryId: fields[4] as int,
+      wordDefinition: fields[5] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, CardsInternos obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class CardsInternosAdapter extends TypeAdapter<CardsInternos> {
       ..writeByte(3)
       ..write(obj.soundUrl)
       ..writeByte(4)
-      ..write(obj.categoryId);
+      ..write(obj.categoryId)
+      ..writeByte(5)
+      ..write(obj.wordDefinition);
   }
 
   @override

@@ -36,10 +36,17 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
     super.initState();
     CardService cv = CardService();
     _categoriesFuture = cv.fetchCardsInternos(widget.categoryId);
+    _categoriesFuture.then((cards) {
+      print('Cards carregados: ${cards.length}');
+      cards.forEach((card) => print('Card: ${card.name}, ID: ${card.id}'));
+    }).catchError((error) {
+      print('Erro ao carregar cards: $error');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('Building CardsInternosPage with categoryId: ${widget.categoryId}');
     final fontProvider = Provider.of<FontProvider>(context);
     return FutureBuilder<List<CardsInternos>>(
       future: _categoriesFuture,
@@ -72,7 +79,6 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
           );
         } else {
           final categories = snapshot.data!;
-
           if (categories.isNotEmpty) {
             widget.categoryName;
           } else {
@@ -109,6 +115,7 @@ class _CardsInternosPageState extends State<CardsInternosPage> {
                             title: category.name,
                             imageUrl: category.imageUrl,
                             soundUrl: category.soundUrl,
+                            word: category.name,
                           ),
                         ),
                       );

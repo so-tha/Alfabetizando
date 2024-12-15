@@ -105,11 +105,21 @@ Future<void> _syncData(Box box) async {
   try {
     final categories = await fetchCategories();
 
-    if (categories.isEmpty) {throw Exception('Nenhuma categoria encontrada.');}
+    if (categories.isEmpty) {
+      if (kDebugMode) {
+        print('Nenhuma categoria encontrada.');
+      }
+      return;
+    }
+    
     await box.clear();
-    for (var category in categories) {await box.put(category.id, category);}
-    } catch (e) {
-    if (kDebugMode) {throw Exception('Erro ao sincronizar dados: $e');}
+    for (var category in categories) {
+      await box.put(category.id, category);
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Erro ao sincronizar dados: $e');
+    }
   }
 }
 

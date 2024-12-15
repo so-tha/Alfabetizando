@@ -20,6 +20,9 @@ class CardsInternos {
 
   @HiveField(4)
   final int categoryId;
+  
+  @HiveField(5)
+  final String wordDefinition;
 
   CardsInternos({
     required this.id,
@@ -27,15 +30,17 @@ class CardsInternos {
     required this.imageUrl,
     required this.soundUrl,
     required this.categoryId,
+    required this.wordDefinition,
   });
 
   factory CardsInternos.fromJson(Map<String, dynamic> json) {
     return CardsInternos(
       id: json['id'] as int,
-      name: json['name'] as String,
-      imageUrl: json['image_url'] as String,
-      soundUrl: json['sound_url'] as String,
+      name: json['name'] as String? ?? '',
+      imageUrl: json['image_url'] as String? ?? '',
+      soundUrl: json['sound_url'] as String? ?? '',
       categoryId: json['category_id'] as int,
+      wordDefinition: json['word_definitions'] as String? ?? '',
     );
   }
 

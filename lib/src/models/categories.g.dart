@@ -20,19 +20,22 @@ class CategoryAdapter extends TypeAdapter<Category> {
       id: fields[0] as int,
       title: fields[1] as String,
       imageUrl: fields[2] as String,
+      soundUrl: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Category obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.imageUrl);
+      ..write(obj.imageUrl)
+      ..writeByte(3)
+      ..write(obj.soundUrl);
   }
 
   @override

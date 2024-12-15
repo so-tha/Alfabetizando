@@ -3,6 +3,7 @@ import 'package:alfabetizando_tcc/src/widgets/alter_card.dart';
 import 'package:alfabetizando_tcc/src/widgets/add_card.dart';
 import 'package:alfabetizando_tcc/src/widgets/delete_card.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 
 class CardconfigScreen extends StatelessWidget {
@@ -59,8 +60,10 @@ class CardconfigScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => DeleteCard()),
-                          );
+                                builder: (context) => DeleteCard(
+                                  box: Hive.box('MyCacheBox'),
+                                ),
+                          ));
                         },
                       ),
                       Spacer(),

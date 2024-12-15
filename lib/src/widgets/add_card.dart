@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/intern.dart';
 import '../services/card_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/font_provider.dart';
+import 'package:hive/hive.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as html_parser;
 
 class AddCardWithAudio extends StatefulWidget {
   final CardService cardService;
@@ -27,6 +31,7 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
   String? _audioPath;
   String? _selectedCategory;
   List<String> _categories = [];
+  late Box _cardsBox;
 
   final Color primaryColor = Colors.orange.shade200;
   final double buttonPadding = 16.0;
@@ -36,7 +41,13 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
     super.initState();
     _initializeRecorder();
     _loadCategories();
+    _initHive();
   }
+  Future<void> _initHive() async {
+      final appDir = await getApplicationDocumentsDirectory();
+      Hive.init(appDir.path);
+      _cardsBox = await Hive.openBox('cards');
+    }
 
   Future<void> _initializeRecorder() async {
     await _recorder.openRecorder();
@@ -46,11 +57,11 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
   Future<void> _loadCategories() async {
     final response = await supabase
         .from('cards')
-        .select('title')
+        .select('id, title')
         .order('title');
     
     setState(() {
-      _categories = (response as List).map((item) => item['title'] as String).toList();
+      _categories = (response as List).map((item) => '${item['id']}:${item['title']}').toList();
     });
   }
 
@@ -96,16 +107,23 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
         String imageUrl = await widget.cardService.uploadFile(_selectedImage!, 'images');
         File audioFile = File(_audioPath!);
         String soundUrl = await widget.cardService.uploadFile(audioFile, 'audios');
+        String? wordDefinition = await getWordDefinition(_wordController.text);
+        int? categoryId = int.tryParse(_selectedCategory!);
+        if (categoryId == null) {
+          throw FormatException('Invalid category ID: $_selectedCategory');
+        }
 
         CardsInternos card = CardsInternos(
           id: _generateUniqueId(),
           name: _wordController.text,
           imageUrl: imageUrl,
           soundUrl: soundUrl,
-          categoryId: int.parse(_selectedCategory!), 
+          categoryId: categoryId,
+          wordDefinition: wordDefinition!
         );
 
         await widget.cardService.addCardsInternos(card);
+        await _cardsBox.add(card);
 
         Navigator.of(context).pop();
 
@@ -147,6 +165,7 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
     _recorder.closeRecorder();
     _wordController.dispose();
     super.dispose();
+    _cardsBox.close();
   }
 
   @override
@@ -258,10 +277,13 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
         DropdownButton<String>(
           value: _selectedCategory,
           items: _categories.map((category) {
+            final parts = category.split(':');
+            final id = parts[0];
+            final title = parts.length > 1 ? parts[1] : id;
             return DropdownMenuItem<String>(
-              value: category,
+              value: id,
               child: Text(
-                category,
+                title,
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
             );
@@ -292,10 +314,35 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
     return Consumer<FontProvider>(
       builder: (context, fontProvider, child) {
         return ElevatedButton(
-          onPressed: _saveCard,
+          onPressed: () async {
+            final shouldSave = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Confirmar alterações'),
+                  content: Text('Tem certeza que deseja salvar o cartão?'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Cancelar'),
+                      onPressed: () => Navigator.of(context).pop(false),
+                    ),
+                    TextButton(
+                      child: Text('Salvar'),
+                      onPressed: () => Navigator.of(context).pop(true),
+                    ),
+                  ],
+                );
+              },
+            );
+
+            if (shouldSave == true) {
+              await _saveCard(); 
+            }
+          },
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: buttonPadding, vertical: buttonPadding),
+            padding: EdgeInsets.symmetric(horizontal: buttonPadding * 1.2, vertical: buttonPadding * 1.2),
             backgroundColor: primaryColor,
+            minimumSize: Size(120, 48),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -307,9 +354,29 @@ class _AddCardWithAudioState extends State<AddCardWithAudio> {
                 style: TextStyle(fontSize: fontProvider.fontSize.toDouble()),
               ),
             ],
-          ), 
+          ),
         );
       },
     );
+  }
+
+  Future<String?> getWordDefinition(String word) async {
+    try {
+      final url = 'https://dicionario.priberam.org/$word';
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        var document = html_parser.parse(response.body);
+        var wordBlock = document.querySelector('span.titpalavra');
+
+        if (wordBlock != null) {
+          return wordBlock.text;
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Erro ao buscar definição: $e');
+      return null;
+    }
   }
 }

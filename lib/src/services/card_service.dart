@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive/hive.dart';
@@ -13,11 +12,18 @@ class CardService {
           .from('cards_internos')
           .select()
           .eq('category_id', categoryId);
-
       final List<dynamic> data = response as List<dynamic>;
-      return data
+      
+      if (data.isEmpty) {
+        if (kDebugMode) {
+          print('Nenhum card encontrado para esta categoria');
+        }
+        return [];
+      }
+      final cards = data
           .map((json) => CardsInternos.fromJson(json as Map<String, dynamic>))
           .toList();
+      return cards;
     } catch (e) {
       throw Exception('Erro ao buscar cards internos: $e');
     }

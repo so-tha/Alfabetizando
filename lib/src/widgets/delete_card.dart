@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DeleteCard extends StatefulWidget {
-  const DeleteCard({super.key});
+  final Box box;
+  
+  const DeleteCard({
+    Key? key,
+    required this.box,
+  }) : super(key: key);
 
   @override
   _DeleteCardState createState() => _DeleteCardState();
@@ -22,26 +28,52 @@ class _DeleteCardState extends State<DeleteCard> {
   }
 
   Future<void> _loadCategories() async {
+    final cardBox = widget.box;
+
+    // Tenta carregar categorias do Hive
+    final cachedCategories = cardBox.get('categories');
+    if (cachedCategories != null) {
+      setState(() {
+        _categories = List<String>.from(cachedCategories);
+      });
+      return;
+    }
+
+    // Caso não tenha no Hive, carrega do Supabase e armazena
     final response = await Supabase.instance.client
         .from('cards')
         .select('title')
         .order('title');
-    
+
     setState(() {
       _categories = (response as List).map((item) => item['title'] as String).toList();
+      cardBox.put('categories', _categories); // Armazena categorias no Hive
     });
   }
 
   Future<void> _loadCards() async {
     if (_selectedCategory == null) return;
 
+    final cardBox = widget.box;
+    final cachedCards = cardBox.get(_selectedCategory);
+
+    // Tenta carregar cartões da categoria do Hive
+    if (cachedCards != null) {
+      setState(() {
+        _cards = List<String>.from(cachedCards);
+        _selectedCard = null;
+      });
+      return;
+    }
+
+    // Caso não tenha no Hive, carrega do Supabase e armazena
     final categoryResponse = await Supabase.instance.client
         .from('cards')
         .select('id')
         .eq('title', _selectedCategory as Object)
         .single();
-
     final int categoryId = categoryResponse['id'];
+
     final cardsResponse = await Supabase.instance.client
         .from('cards_internos')
         .select('name')
@@ -50,14 +82,15 @@ class _DeleteCardState extends State<DeleteCard> {
 
     setState(() {
       _cards = (cardsResponse as List).map((item) => item['name'] as String).toList();
+      cardBox.put(_selectedCategory, _cards); // Armazena cartas no Hive
       _selectedCard = null;
     });
-    }
+  }
 
   Future<void> _deletarCartao() async {
     if (_selectedCategory == null || _selectedCard == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, selecione uma categoria e um cartão.')),
+        const SnackBar(content: Text('Por favor, selecione uma categoria e um cartão.')),
       );
       return;
     }
@@ -66,7 +99,7 @@ class _DeleteCardState extends State<DeleteCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmar exclusão'),
+          title: const Text('Confirmar exclusão'),
           content: Text('Você tem certeza de que deseja excluir o cartão "$_selectedCard"?'),
           actions: <Widget>[
             TextButton(
@@ -75,7 +108,7 @@ class _DeleteCardState extends State<DeleteCard> {
                 foregroundColor: Colors.white,
               ),
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               style: TextButton.styleFrom(
@@ -83,7 +116,7 @@ class _DeleteCardState extends State<DeleteCard> {
                 foregroundColor: Colors.white,
               ),
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Sim'),
+              child: const Text('Sim'),
             ),
           ],
         );
@@ -102,7 +135,6 @@ class _DeleteCardState extends State<DeleteCard> {
           .select('id')
           .eq('title', _selectedCategory as Object)
           .single();
-
       final int categoriaId = categoriaResponse['id'];
 
       final deleteResponse = await Supabase.instance.client
@@ -117,13 +149,17 @@ class _DeleteCardState extends State<DeleteCard> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cartão deletado com sucesso!')),
+          const SnackBar(content: Text('Cartão deletado com sucesso!')),
         );
+        final cardBox = widget.box;
+        _cards.remove(_selectedCard);
+        cardBox.put(_selectedCategory, _cards);
+
         setState(() {
-          _selectedCategory = null;
           _selectedCard = null;
+          _selectedCategory = null;
         });
-        _loadCategories();
+        _loadCategories(); 
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

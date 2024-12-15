@@ -3,17 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:provider/provider.dart';
 import '../providers/font_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/parser.dart' as html_parser;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CardDetailPage extends StatefulWidget {
   final String title;
   final String imageUrl;
   final String soundUrl;
+  final String word;
 
   const CardDetailPage({
     super.key,
     required this.title,
     required this.imageUrl,
     required this.soundUrl,
+    required this.word,
   });
 
   @override
@@ -22,6 +27,7 @@ class CardDetailPage extends StatefulWidget {
 
 class _CardDetailPageState extends State<CardDetailPage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final _supabase = Supabase.instance.client;
 
   @override
   void dispose() {
@@ -29,10 +35,56 @@ class _CardDetailPageState extends State<CardDetailPage> {
     super.dispose();
   }
 
+  Future<String?> fetchWordDefinition(String word) async {
+    final url = 'https://dicionario.priberam.org/$word';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      var document = html_parser.parse(response.body);
+
+      var wordBlock = document.querySelector('span.titpalavra');
+
+      if (wordBlock != null) {
+        return wordBlock.text;
+      } else {
+        throw Exception('Bloco de palavra não encontrado.');
+      }
+    } else {
+      throw Exception('Falha ao carregar a página: ${response.statusCode}');
+    }
+  }
+
+  Future<String?> getWordDefinition(String word) async {
+    // Verifica se já existe definição no card
+    final response = await _supabase
+        .from('cards_internos')
+        .select('word_definition')
+        .eq('word', word)
+        .single();
+
+    if (response['word_definition'] != null) {
+      return response['word_definition'];
+    }
+    // Se não encontrou, busca online e atualiza o card
+    try {
+      final definition = await fetchWordDefinition(word);
+      if (definition != null) {
+        // Atualiza o card com a definição
+        await _supabase
+            .from('cards_internos')
+            .update({'word_definition': definition})
+            .eq('word', word);
+        return definition;
+      }
+    } catch (e) {
+      debugPrint('Erro ao buscar definição: $e');
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final fontProvider = Provider.of<FontProvider>(context);
-    String syllables = splitSyllables(widget.title);
     return Scaffold(
       appBar: AppBar(
         title: Text(capitalizeWords(widget.title)),
@@ -116,51 +168,38 @@ class _CardDetailPageState extends State<CardDetailPage> {
                 ],
               ),
               const SizedBox(height: 10),
-              Text(
-                splitSyllables(widget.title), 
-                style: TextStyle(
-                  fontSize: fontProvider.fontSize.toDouble(),
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
+              FutureBuilder<String?>(
+                future: getWordDefinition(widget.word),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+                    return Text(
+                      '${snapshot.data}',
+                      style: TextStyle(
+                        fontSize: fontProvider.fontSize.toDouble(),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    );
+                  } else {
+                    return Text(
+                      'Nenhuma definição encontrada.',
+                      style: TextStyle(
+                        fontSize: fontProvider.fontSize.toDouble(),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-String splitSyllables(String word) {
-  word = word.toLowerCase();
-  List<String> syllables = [];
-
-  final digraphs = ['ch', 'lh', 'nh', 'qu', 'gu', 'rr'];
-  final vowels = 'aeiouáéíóúãõâêîôûàèìòù';
-  final nasalDitongos = ['ão', 'õe', 'ãe'];
-
-  String buffer = '';
-  for (int i = 0; i < word.length; i++) {
-    buffer += word[i];
-
-    if (i + 1 < word.length && digraphs.contains(word.substring(i, i + 2))) {
-      buffer += word[i + 1];
-      i++;
-    } 
-    else if (i + 1 < word.length && nasalDitongos.contains(word.substring(i, i + 2))) {
-      buffer += word[i + 1];
-      i++;
-    }
-    else if (vowels.contains(word[i])) {
-      syllables.add(buffer);
-      buffer = '';
-    }
-  }
-
-  if (buffer.isNotEmpty) {
-    syllables.add(buffer);
-  }
-
-  return syllables.join('-');
   }
 }
