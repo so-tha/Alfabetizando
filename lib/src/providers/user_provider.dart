@@ -1,16 +1,20 @@
 import 'dart:io';
 import 'package:alfabetizando_tcc/src/models/user_preferences.dart';
+import 'package:alfabetizando_tcc/src/pages/welcome_screen%20.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user.dart' as AppUser;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 
 class UserProvider extends ChangeNotifier {
   AppUser.User? _user;
   UserPreferences _userPreferences = UserPreferences(fontSize: 16.0, defaultFontId: 'Roboto');
   final SupabaseClient supabase = Supabase.instance.client;
+  final Box box;
 
-  UserProvider(this._user, this._userPreferences);
+  UserProvider(this._user, this._userPreferences, this.box);
   AppUser.User? get user => _user;
   UserPreferences get userPreferences => _userPreferences;
 
@@ -136,5 +140,41 @@ class UserProvider extends ChangeNotifier {
   void updateUserPreferences(UserPreferences preferences) {
     _userPreferences = preferences;
     notifyListeners();
+  }
+
+  Future<void> logout(BuildContext context) async {
+    try {
+      _user = AppUser.User(
+        id: '',
+        email: '',
+        name: '',
+        photoUrl: '',
+      );
+
+      _userPreferences = UserPreferences(
+        fontSize: 16.0,
+        defaultFontId: 'helvetica',
+      );
+
+      await Supabase.instance.client.auth.signOut();
+
+      notifyListeners();
+
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => WelcomeScreen(box: box)),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer logout: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

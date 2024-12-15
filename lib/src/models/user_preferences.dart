@@ -26,7 +26,7 @@ class UserPreferences {
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
     return UserPreferences(
       fontSize: (json['font_size'] as num).toDouble(),
-      defaultFontId: json['default_font_id'] as String, // Obtido do JSON
+      defaultFontId: json['default_font_id'] as String, 
     );
   }
 

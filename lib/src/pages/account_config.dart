@@ -32,6 +32,48 @@ class _AccountConfigPageState extends State<AccountConfigPage> {
       appBar: AppBar(
         title: const Text('Configuração da Conta'),
         backgroundColor: Colors.orange.shade200,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Confirmar Logout'),
+                    content: const Text('Tem certeza que deseja sair?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange.shade200,
+                        ),
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Provider.of<UserProvider>(context, listen: false)
+                              .logout(context);
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Text(
+                          'Sair',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: AccountConfigForm(controller: controller),
     );
@@ -275,6 +317,7 @@ class AccountConfigForm extends StatelessWidget {
             );
           },
         );
+
 
         if (shouldSave == true) {
           try {

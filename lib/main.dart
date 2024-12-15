@@ -55,7 +55,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FontProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider(user, userPreferences!)),
+        ChangeNotifierProvider(create: (_) => UserProvider(user, userPreferences!,box)),
       ],
       child: MyApp(box: box),
     ),
