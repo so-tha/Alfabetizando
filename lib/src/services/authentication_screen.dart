@@ -84,17 +84,25 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       await _authController.signUp(email, password, name);
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(box: widget.box),
-        ),
-        (Route<dynamic> route) => false, 
-      );
+      await _authController.signUp(email, password, name);
+      
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(box: widget.box),
+          ),
+          (Route<dynamic> route) => false, 
+        );
+      }
     } on AuthException catch (e) {
       _handleError(e.message);
     } catch (e) {
-      _handleError('Ocorreu um erro inesperado');
+      if (e.toString().contains('over_email_send_rate_limit')) {
+        _handleError('Muitas tentativas de registro. Por favor, aguarde alguns minutos e tente novamente.');
+      } else {
+        _handleError('Ocorreu um erro inesperado: $e');
+      }
     } finally {
       setState(() {
         _isLoading = false;
@@ -119,7 +127,11 @@ class _AuthScreenState extends State<AuthScreen> {
     } on AuthException catch (e) {
       _handleError(e.message);
     } catch (e) {
-      _handleError('Ocorreu um erro inesperado');
+      if (e.toString().contains('invalid_login_credentials')) {
+        _handleError('Email ou senha incorretos.');
+      } else {
+        _handleError('Ocorreu um erro inesperado');
+      }
     } finally {
       setState(() {
         _isLoading = false;
@@ -192,12 +204,34 @@ class _AuthScreenState extends State<AuthScreen> {
                           TextFormField(
                             controller: _passwordController,
                             obscureText: true,
-                            decoration: _buildInputDecoration('Senha'),
+                            decoration: _buildInputDecoration('Senha').copyWith(
+                              helperText: !_isLogin ? 'A senha deve conter:\n'
+                                  '• Pelo menos uma letra minúscula\n'
+                                  '• Pelo menos uma letra maiúscula\n'
+                                  '• Pelo menos um número\n'
+                                  '• Mínimo de 6 caracteres' : null,
+                              helperMaxLines: 5,
+                              errorMaxLines: 3,
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Por favor, insira sua senha.';
-                              } else if (value.length < 6) {
-                                return 'A senha deve ter pelo menos 6 caracteres.';
+                              } else if (value != value) {
+                                return 'As senhas não correspondem.';
+                              }
+                              if (!_isLogin) {
+                                if (value.length < 6) {
+                                  return 'A senha deve ter pelo menos 6 caracteres.';
+                                }
+                                if (!value.contains(RegExp(r'[a-z]'))) {
+                                  return 'A senha deve conter pelo menos uma letra minúscula.';
+                                }
+                                if (!value.contains(RegExp(r'[A-Z]'))) {
+                                  return 'A senha deve conter pelo menos uma letra maiúscula.';
+                                }
+                                if (!value.contains(RegExp(r'[0-9]'))) {
+                                  return 'A senha deve conter pelo menos um número.';
+                                }
                               }
                               return null;
                             },

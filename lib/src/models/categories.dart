@@ -52,16 +52,29 @@ String capitalizeWords(String s) => s
 
     
 Future<List<Category>> fetchCategories() async {
-  final response = await Supabase.instance.client.from('cards').select();
+  try {
+    final response = await Supabase.instance.client
+        .from('cards')
+        .select();
 
-  if (response.isEmpty) {
-    throw Exception('Nenhuma categoria encontrada.');
+    if (response.isEmpty) {
+      throw Exception('Nenhuma categoria encontrada.');
+    }
+
+    final List<dynamic> data = response as List<dynamic>;
+ 
+
+    return data.map((json) {
+      try {
+        return Category.fromJson(json as Map<String, dynamic>);
+      } catch (e) {
+        rethrow;
+      }
+    }).toList();
+
+  } catch (e) {
+    throw Exception('Falha ao carregar categorias: $e');
   }
-
-  final List<dynamic> data = response as List<dynamic>;
-  return data
-      .map((json) => Category.fromJson(json as Map<String, dynamic>))
-      .toList();
 }
 
 Future<void> addCategory(Category category) async {

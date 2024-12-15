@@ -36,48 +36,70 @@ class _CardDetailPageState extends State<CardDetailPage> {
   }
 
   Future<String?> fetchWordDefinition(String word) async {
-    final url = 'https://dicionario.priberam.org/$word';
-    final response = await http.get(Uri.parse(url));
+    try {
+      print('Iniciando busca online para: $word');
+      final url = 'https://dicionario.priberam.org/$word';
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      var document = html_parser.parse(response.body);
+      print('Status code da resposta: ${response.statusCode}');
 
-      var wordBlock = document.querySelector('span.titpalavra');
+      if (response.statusCode == 200) {
+        var document = html_parser.parse(response.body);
+        var wordBlock = document.querySelector('span.titpalavra');
 
-      if (wordBlock != null) {
-        return wordBlock.text;
+        if (wordBlock != null) {
+          print('Definição encontrada: ${wordBlock.text}');
+          return wordBlock.text;
+        } else {
+          print('Bloco de palavra não encontrado na página');
+          throw Exception('Bloco de palavra não encontrado.');
+        }
       } else {
-        throw Exception('Bloco de palavra não encontrado.');
+        print('Falha na requisição HTTP: ${response.statusCode}');
+        throw Exception('Falha ao carregar a página: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Falha ao carregar a página: ${response.statusCode}');
+    } catch (e) {
+      print('Erro ao buscar definição online: $e');
+      throw Exception('Erro ao buscar definição online: $e');
     }
   }
 
   Future<String?> getWordDefinition(String word) async {
-    // Verifica se já existe definição no card
-    final response = await _supabase
-        .from('cards_internos')
-        .select('word_definition')
-        .eq('word', word)
-        .single();
-
-    if (response['word_definition'] != null) {
-      return response['word_definition'];
-    }
-    // Se não encontrou, busca online e atualiza o card
     try {
+      print('Buscando definição para a palavra: $word');
+
+      final response = await _supabase
+          .from('cards_internos')
+          .select('word_definitions')
+          .eq('name', word.toLowerCase())
+          .single();
+
+      print('Resposta do Supabase: $response');
+
+      if (response['word_definitions'] != null) {
+        print('Definição encontrada no banco: ${response['word_definitions']}');
+        return response['word_definitions'];
+      }
+
+      print('Definição não encontrada no banco, buscando online...');
+
       final definition = await fetchWordDefinition(word);
+      print('Definição obtida online: $definition');
+
       if (definition != null) {
-        // Atualiza o card com a definição
         await _supabase
             .from('cards_internos')
-            .update({'word_definition': definition})
-            .eq('word', word);
+            .update({'word_definitions': definition})
+            .eq('name', word.toLowerCase());
+        
+        print('Definição salva no banco com sucesso');
         return definition;
       }
     } catch (e) {
-      debugPrint('Erro ao buscar definição: $e');
+      print('Erro detalhado ao buscar definição: $e');
+      if (e.toString().contains('PostgrestError')) {
+        print('Erro do Supabase: $e');
+      }
     }
     return null;
   }
