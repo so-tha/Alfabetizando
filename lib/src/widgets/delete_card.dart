@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DeleteCard extends StatefulWidget {
@@ -20,18 +21,30 @@ class _DeleteCardState extends State<DeleteCard> {
   bool _isLoading = false;
   List<String> _categories = [];
   List<String> _cards = [];
-
+  late Box _box;
   @override
   void initState() {
     super.initState();
+    _initHive();
     _loadCategories();
   }
 
-  Future<void> _loadCategories() async {
-    final cardBox = widget.box;
+  Future<void> _initHive() async {
+    try {
+      final appDocumentDirectory = await getApplicationDocumentsDirectory();
+      await Hive.initFlutter(appDocumentDirectory.path);
+      _box = widget.box;
+    } catch (e) {
+      if (mounted) {  // Verificar se o widget ainda está montado
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao inicializar o banco de dados: $e')),
+        );
+      }
+    }
+  }
 
-    // Tenta carregar categorias do Hive
-    final cachedCategories = cardBox.get('categories');
+  Future<void> _loadCategories() async {
+    final cachedCategories = _box.get('categories');
     if (cachedCategories != null) {
       setState(() {
         _categories = List<String>.from(cachedCategories);
@@ -39,52 +52,61 @@ class _DeleteCardState extends State<DeleteCard> {
       return;
     }
 
-    // Caso não tenha no Hive, carrega do Supabase e armazena
-    final response = await Supabase.instance.client
-        .from('cards')
-        .select('title')
-        .order('title');
+    try {
+      final response = await Supabase.instance.client
+          .from('cards')
+          .select('title')
+          .order('title');
 
-    setState(() {
-      _categories = (response as List).map((item) => item['title'] as String).toList();
-      cardBox.put('categories', _categories); // Armazena categorias no Hive
-    });
+      setState(() {
+        _categories = (response as List).map((item) => item['title'].toString()).toList();
+        _box.put('categories', _categories);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar categorias: $e')),
+      );
+    }
   }
 
   Future<void> _loadCards() async {
     if (_selectedCategory == null) return;
 
-    final cardBox = widget.box;
-    final cachedCards = cardBox.get(_selectedCategory);
+    try {
+      final cachedCards = _box.get(_selectedCategory);
 
-    // Tenta carregar cartões da categoria do Hive
-    if (cachedCards != null) {
+      if (cachedCards != null) {
+        setState(() {
+          _cards = List<String>.from(cachedCards);
+          _selectedCard = null;
+        });
+        return;
+      }
+
+      final categoryResponse = await Supabase.instance.client
+          .from('cards')
+          .select('id')
+          .eq('title', _selectedCategory!)
+          .single();
+
+      final int categoryId = categoryResponse['id'];
+
+      final cardsResponse = await Supabase.instance.client
+          .from('cards_internos')
+          .select('name')
+          .eq('category_id', categoryId)
+          .order('name');
+
       setState(() {
-        _cards = List<String>.from(cachedCards);
+        _cards = (cardsResponse as List).map((item) => item['name'] as String).toList();
+        _box.put(_selectedCategory, _cards);
         _selectedCard = null;
       });
-      return;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar cartões: $e')),
+      );
     }
-
-    // Caso não tenha no Hive, carrega do Supabase e armazena
-    final categoryResponse = await Supabase.instance.client
-        .from('cards')
-        .select('id')
-        .eq('title', _selectedCategory as Object)
-        .single();
-    final int categoryId = categoryResponse['id'];
-
-    final cardsResponse = await Supabase.instance.client
-        .from('cards_internos')
-        .select('name')
-        .eq('category_id', categoryId)
-        .order('name');
-
-    setState(() {
-      _cards = (cardsResponse as List).map((item) => item['name'] as String).toList();
-      cardBox.put(_selectedCategory, _cards); // Armazena cartas no Hive
-      _selectedCard = null;
-    });
   }
 
   Future<void> _deletarCartao() async {
@@ -95,72 +117,71 @@ class _DeleteCardState extends State<DeleteCard> {
       return;
     }
 
-    bool confirmDelete = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar exclusão'),
-          content: Text('Você tem certeza de que deseja excluir o cartão "$_selectedCard"?'),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Color.fromRGBO(51, 65, 222, 1),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Sim'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (!confirmDelete) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
+      final confirmDelete = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Confirmar exclusão'),
+            content: Text('Você tem certeza de que deseja excluir o cartão "$_selectedCard"?'),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Color.fromRGBO(51, 65, 222, 1),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Sim'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmDelete != true) return;
+
+      setState(() {
+        _isLoading = true;
+      });
+
       final categoriaResponse = await Supabase.instance.client
           .from('cards')
           .select('id')
-          .eq('title', _selectedCategory as Object)
+          .eq('title', _selectedCategory!)
           .single();
+
       final int categoriaId = categoriaResponse['id'];
 
       final deleteResponse = await Supabase.instance.client
           .from('cards_internos')
           .delete()
           .eq('category_id', categoriaId)
-          .eq('name', _selectedCard as Object);
+          .eq('name', _selectedCard!);
 
       if (deleteResponse.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(deleteResponse.error!.message)),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cartão deletado com sucesso!')),
-        );
-        final cardBox = widget.box;
-        _cards.remove(_selectedCard);
-        cardBox.put(_selectedCategory, _cards);
-
-        setState(() {
-          _selectedCard = null;
-          _selectedCategory = null;
-        });
-        _loadCategories(); 
+        throw Exception(deleteResponse.error!.message);
       }
+
+      _cards.remove(_selectedCard);
+      _box.put(_selectedCategory, _cards);
+
+      setState(() {
+        _selectedCard = null;
+        _cards = _cards.where((card) => card != _selectedCard).toList();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cartão deletado com sucesso!')),
+      );
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ocorreu um erro: $e')),

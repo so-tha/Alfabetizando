@@ -75,7 +75,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
           .single();
 
       print('Resposta do Supabase: $response');
-
+  
       if (response['word_definitions'] != null) {
         print('Definição encontrada no banco: ${response['word_definitions']}');
         return response['word_definitions'];
