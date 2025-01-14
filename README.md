@@ -73,7 +73,7 @@ Contribuições são bem-vindas! Siga os seguintes passos para contribuir:
 5. Abra um Pull Request.
 
 ## Licença
-Este projeto está licenciado sob a [Licença MIT](LICENSE).
+Este projeto está licenciado sob os termos da [GNU General Public License v3.0](LICENSE).
 
 ## Contato
 Se tiver dúvidas ou sugestões, entre em contato:
