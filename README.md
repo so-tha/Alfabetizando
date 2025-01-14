@@ -25,7 +25,7 @@ Proporcionar uma ferramenta educativa acessível que facilita o aprendizado de c
 - **Banco de Dados:** Supabase  
 - **Controle de Versão:** Git  
 - **Design de Interfaces:** Figma e Canva  
-- **Diretrizes de Acessibilidade:** GAIA (Grupo de Acessibilidade e Inclusão em Ambientes Virtuais)  
+- **Diretrizes de Acessibilidade:** GAIA (Guia de Acessibilidade de Interfaces para Autismo)  
 
 ## Funcionalidades
 - Interface intuitiva e acessível para crianças não verbais.
